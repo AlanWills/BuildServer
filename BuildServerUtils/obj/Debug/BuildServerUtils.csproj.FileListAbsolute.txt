@@ -1,0 +1,5 @@
+C:\Users\alan\Documents\BuildServer\BuildServerUtils\obj\Debug\BuildServerUtils.csprojResolveAssemblyReference.cache
+C:\Users\alan\Documents\BuildServer\BuildServerUtils\bin\Debug\BuildServerUtils.dll
+C:\Users\alan\Documents\BuildServer\BuildServerUtils\bin\Debug\BuildServerUtils.pdb
+C:\Users\alan\Documents\BuildServer\BuildServerUtils\obj\Debug\BuildServerUtils.dll
+C:\Users\alan\Documents\BuildServer\BuildServerUtils\obj\Debug\BuildServerUtils.pdb

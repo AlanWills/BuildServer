@@ -1,0 +1,24 @@
+C:\Users\alan\Documents\Visual Studio 2015\Projects\BuildServer\BuildServer\bin\Debug\BuildServer.exe.config
+C:\Users\alan\Documents\Visual Studio 2015\Projects\BuildServer\BuildServer\bin\Debug\BuildServer.exe
+C:\Users\alan\Documents\Visual Studio 2015\Projects\BuildServer\BuildServer\bin\Debug\BuildServer.pdb
+C:\Users\alan\Documents\Visual Studio 2015\Projects\BuildServer\BuildServer\obj\Debug\BuildServer.csprojResolveAssemblyReference.cache
+C:\Users\alan\Documents\Visual Studio 2015\Projects\BuildServer\BuildServer\obj\Debug\BuildServer.exe
+C:\Users\alan\Documents\Visual Studio 2015\Projects\BuildServer\BuildServer\obj\Debug\BuildServer.pdb
+C:\Users\alan\Documents\GROW\BuildServer\BuildServer\bin\Debug\BuildServer.exe.config
+C:\Users\alan\Documents\GROW\BuildServer\BuildServer\obj\Debug\BuildServer.exe
+C:\Users\alan\Documents\GROW\BuildServer\BuildServer\obj\Debug\BuildServer.pdb
+C:\Users\alan\Documents\GROW\BuildServer\BuildServer\bin\Debug\BuildServer.exe
+C:\Users\alan\Documents\GROW\BuildServer\BuildServer\bin\Debug\BuildServer.pdb
+C:\Users\alan\Documents\GROW\BuildServer\BuildServer\obj\Debug\BuildServer.csprojResolveAssemblyReference.cache
+C:\Users\alan\Documents\GROW\BuildServer\bin\BuildServer.exe.config
+C:\Users\alan\Documents\bin\BuildServer.exe.config
+C:\Users\alan\Documents\BuildServer\obj\Debug\BuildServer.exe
+C:\Users\alan\Documents\BuildServer\obj\Debug\BuildServer.pdb
+C:\Users\alan\Documents\bin\BuildServer.exe
+C:\Users\alan\Documents\bin\BuildServer.pdb
+C:\Users\alan\Documents\BuildServer\bin\BuildServer.exe.config
+C:\Users\alan\Documents\BuildServer\bin\BuildServer.exe
+C:\Users\alan\Documents\BuildServer\bin\BuildServer.pdb
+C:\Users\alan\Documents\BuildServer\obj\Debug\BuildServer.csprojResolveAssemblyReference.cache
+C:\Users\alan\Documents\BuildServer\bin\BuildServerUtils.dll
+C:\Users\alan\Documents\BuildServer\bin\BuildServerUtils.pdb
