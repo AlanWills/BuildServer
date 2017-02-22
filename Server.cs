@@ -9,24 +9,44 @@ using System.IO;
 using System.Net;
 using System.Net.Mail;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 
 namespace BuildServer
 {
     public class Server : BaseServer
     {
+        enum BuildState
+        {
+            kBuilding,
+            kNotBuilding
+        }
+
+        #region Properties and Fields
+
+        /// <summary>
+        /// A dictionary of all the branches that are available and their current build state.
+        /// </summary>
+        private object branchesLock = new object();
+        private Dictionary<string, BuildState> Branches { get; set; } = new Dictionary<string, BuildState>();
+
+        #endregion
+
         protected override void ProcessMessage(byte[] data)
         {
-            base.ProcessMessage(data);
-
-            string[] strings = data.ConvertToString().Split(',');
-
-            if (strings.Length == 4 && strings[0] == "Request Build")
+            Task.Factory.StartNew(() =>
             {
-                Console.WriteLine("Request Received for " + strings[1]);
+                base.ProcessMessage(data);
 
-                TestProject("GrowDesktop", strings[1], strings[2], strings[3]);
-            }
+                string[] strings = data.ConvertToString().Split(',');
+
+                if (strings.Length == 4 && strings[0] == "Request Build")
+                {
+                    Console.WriteLine("Request Received for " + strings[1]);
+
+                    TestProject("GrowDesktop", strings[1], strings[2], strings[3]);
+                }
+            });
         }
 
         /// <summary>
@@ -36,6 +56,24 @@ namespace BuildServer
         /// <param name="projectExeName"></param>
         private void TestProject(string projectGithubRepoName, string branchName, string email, string notifySetting)
         {
+            lock (branchesLock)
+            {
+                if (!Branches.ContainsKey(branchName))
+                {
+                    Branches.Add(branchName, BuildState.kNotBuilding);
+                }
+
+                if (Branches[branchName] == BuildState.kBuilding)
+                {
+                    // If we're already building, don't worry about testing again
+                    // Maybe in the future, add the email to a list we notify?
+                    return;
+                }
+
+                // Now set the branch to be building
+                Branches[branchName] = BuildState.kBuilding;
+            }
+
             // This will change directory into the checked out branch
             CheckoutBranch(projectGithubRepoName, branchName);
             
@@ -43,6 +81,12 @@ namespace BuildServer
             CmdLineUtils.PerformCommand("\"" + Path.Combine("Dev Tools", "Git Hooks", "Build Server", "run_tests.bat") + "\"", "");
 
             ReadFilesAndSendMessage(email, notifySetting);
+
+            lock (branchesLock)
+            {
+                // Now set the branch to be not building
+                Branches[branchName] = BuildState.kNotBuilding;
+            }
 
             // Move back out of the checked out branch
             Environment.CurrentDirectory = Directory.GetParent(Environment.CurrentDirectory).FullName;

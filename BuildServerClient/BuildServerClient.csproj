@@ -59,7 +59,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BuildServer\BuildServerUtils\BuildServerUtils.csproj">
+    <ProjectReference Include="..\BuildServerUtils\BuildServerUtils.csproj">
       <Project>{12A3F3FC-300C-4792-B987-282C123B8925}</Project>
       <Name>BuildServerUtils</Name>
     </ProjectReference>
