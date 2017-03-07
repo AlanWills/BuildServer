@@ -1,6 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
-<Root>
-  <Email>alan@grow.am</Email>
-  <!--Put N here for all build updates-->
-  <OnlyEmailOnFail>N</OnlyEmailOnFail>
-</Root>

@@ -28,9 +28,9 @@ namespace BuildServerUtils
 
         #endregion
 
-        public BaseServer()
+        public BaseServer(int port = 1490)
         {
-            Listener = new TcpListener(IPAddress.Any, 1490);
+            Listener = new TcpListener(IPAddress.Any, port);
             Listener.Start();
 
             ListenForNewClient();

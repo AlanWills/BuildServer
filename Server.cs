@@ -9,6 +9,7 @@ using System.IO;
 using System.Net;
 using System.Net.Mail;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 
@@ -31,6 +32,11 @@ namespace BuildServer
         private Dictionary<string, BuildState> Branches { get; set; } = new Dictionary<string, BuildState>();
 
         #endregion
+
+        public Server(int port = 1490) : 
+            base(port)
+        {
+        }
 
         protected override void ProcessMessage(byte[] data)
         {
@@ -80,7 +86,7 @@ namespace BuildServer
             CmdLineUtils.PerformCommand("\"" + Path.Combine("Dev Tools", "Git Hooks", "Build Server", "compile.bat") + "\"", "");
             CmdLineUtils.PerformCommand("\"" + Path.Combine("Dev Tools", "Git Hooks", "Build Server", "run_tests.bat") + "\"", "");
 
-            ReadFilesAndSendMessage(email, notifySetting);
+            ReadFilesAndSendMessage(branchName, email, notifySetting);
 
             lock (branchesLock)
             {
@@ -120,7 +126,7 @@ namespace BuildServer
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void ReadFilesAndSendMessage(string email, string notifySetting)
+        private void ReadFilesAndSendMessage(string branchName, string email, string notifySetting)
         {
             string testResults = Path.Combine(Environment.CurrentDirectory, "TestResults");
             if (!Directory.Exists(testResults))
@@ -156,7 +162,8 @@ namespace BuildServer
             // "Y" means only email on fail
             if (!passed || notifySetting != "Y")
             {
-                Message(messageContents, email, passed);
+                Message(messageContents, branchName, email, passed);
+                Console.WriteLine("Message sent to " + email);
             }
 
             Console.WriteLine("Testing run complete");
@@ -166,19 +173,54 @@ namespace BuildServer
         /// Either sends back via comms or emails the inputted string in the string builder to me if there is no connection
         /// </summary>
         /// <param name="testRunInformation"></param>
-        private void Message(StringBuilder testRunInformation, string email, bool passed)
+        private void Message(StringBuilder testRunInformation, string branchName, string email, bool passed)
         {
+            string settingsFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Settings.xml");
+            if (!File.Exists(settingsFilePath))
+            {
+                Console.WriteLine("No Settings File.");
+                Thread.Sleep(2);
+                return;
+            }
+
+            XmlDocument document = new XmlDocument();
+            document.Load(settingsFilePath);
+
+            XmlNodeList serverEmail = document.GetElementsByTagName("ServerEmail");
+            if (serverEmail.Count != 1 || string.IsNullOrEmpty(serverEmail[0].InnerText))
+            {
+                Console.WriteLine("No Server Email in Settings File.");
+                Thread.Sleep(2);
+                return;
+            }
+
+            XmlNodeList emailUsername = document.GetElementsByTagName("ServerEmailUsername");
+            if (emailUsername.Count != 1 || string.IsNullOrEmpty(emailUsername[0].InnerText))
+            {
+                Console.WriteLine("No Server Email Username in Settings File.");
+                Thread.Sleep(2);
+                return;
+            }
+
+            XmlNodeList emailPassword = document.GetElementsByTagName("ServerEmailPassword");
+            if (emailPassword.Count != 1 || string.IsNullOrEmpty(emailPassword[0].InnerText))
+            {
+                Console.WriteLine("No Server Email Password in Settings File.");
+                Thread.Sleep(2);
+                return;
+            }
+
             DateTime buildCompleteTime = DateTime.Now;
 
             testRunInformation.AppendLine();
             testRunInformation.Append("Build Request completed at " + buildCompleteTime.ToShortTimeString());
 
-            MailMessage mail = new MailMessage("alawills@googlemail.com", email, passed ? "Build Passed" : "Build Failed", testRunInformation.ToString());
+            MailMessage mail = new MailMessage(serverEmail[0].InnerText, email, (branchName + " - ") + (passed ? "Build Passed" : "Build Failed"), testRunInformation.ToString());
             SmtpClient client = new SmtpClient("smtp.gmail.com", 587);
             
             client.Port = 587;
             client.UseDefaultCredentials = false;
-            client.Credentials = new NetworkCredential("alawills", "favouriteprimes111929");
+            client.Credentials = new NetworkCredential(emailUsername[0].InnerText, emailPassword[0].InnerText);
             client.EnableSsl = true;
 
             client.Send(mail);
