@@ -27,10 +27,12 @@ namespace BuildServerClient
         {
             if (!File.Exists(filePath))
             {
-                Console.WriteLine("No Settings File.");
-                Thread.Sleep(2);
+                Console.WriteLine("No Settings File at " + filePath);
+                Thread.Sleep(2000);
                 return;
             }
+
+            Console.WriteLine("Reading Settings file");
 
             XmlDocument document = new XmlDocument();
             document.Load(filePath);
@@ -41,7 +43,7 @@ namespace BuildServerClient
                 if (serverIP.Count != 1 || string.IsNullOrEmpty(serverIP[0].InnerText))
                 {
                     Console.WriteLine("No Server IP in Settings File.");
-                    Thread.Sleep(2);
+                    Thread.Sleep(2000);
                     return;
                 }
 
@@ -55,7 +57,7 @@ namespace BuildServerClient
                 if (serverPort.Count != 1 || string.IsNullOrEmpty(serverPort[0].InnerText))
                 {
                     Console.WriteLine("No Server Port in Settings File.");
-                    Thread.Sleep(2);
+                    Thread.Sleep(2000);
                     return;
                 }
 
@@ -63,7 +65,7 @@ namespace BuildServerClient
                 if (!int.TryParse(serverPort[0].InnerText, out port))
                 {
                     Console.WriteLine("Server Port is not a number.");
-                    Thread.Sleep(2);
+                    Thread.Sleep(2000);
                     return;
                 }
 
@@ -77,7 +79,7 @@ namespace BuildServerClient
                 if (emails.Count != 1 && string.IsNullOrEmpty(emails[0].InnerText))
                 {
                     Console.WriteLine("No Email in Settings file.");
-                    Thread.Sleep(2);
+                    Thread.Sleep(2000);
                     return;
                 }
 
@@ -91,7 +93,7 @@ namespace BuildServerClient
                 if (notifySettings.Count != 1 && string.IsNullOrEmpty(notifySettings[0].InnerText))
                 {
                     Console.WriteLine("No OnlyEmailOnFail in Settings file.");
-                    Thread.Sleep(2);
+                    Thread.Sleep(2000);
                     return;
                 }
 

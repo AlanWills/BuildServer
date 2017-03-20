@@ -28,7 +28,7 @@ namespace BuildServer
             if (!File.Exists(filePath))
             {
                 Console.WriteLine("No Settings.xml File found in " + filePath);
-                Thread.Sleep(2);
+                Thread.Sleep(2000);
                 return;
             }
 
@@ -43,7 +43,7 @@ namespace BuildServer
                 if (serverPort.Count != 1 || string.IsNullOrEmpty(serverPort[0].InnerText))
                 {
                     Console.WriteLine("No Server Port in Settings File.");
-                    Thread.Sleep(2);
+                    Thread.Sleep(2000);
                     return;
                 }
 
@@ -51,7 +51,7 @@ namespace BuildServer
                 if (!int.TryParse(serverPort[0].InnerText, out port))
                 {
                     Console.WriteLine("Server Port is not a number.");
-                    Thread.Sleep(2);
+                    Thread.Sleep(2000);
                     return;
                 }
 
@@ -65,7 +65,7 @@ namespace BuildServer
                 if (serverEmail.Count != 1 || string.IsNullOrEmpty(serverEmail[0].InnerText))
                 {
                     Console.WriteLine("No Server Email in Settings File.");
-                    Thread.Sleep(2);
+                    Thread.Sleep(2000);
                     return;
                 }
 
@@ -79,7 +79,7 @@ namespace BuildServer
                 if (emailUsername.Count != 1 || string.IsNullOrEmpty(emailUsername[0].InnerText))
                 {
                     Console.WriteLine("No Server Email Username in Settings File.");
-                    Thread.Sleep(2);
+                    Thread.Sleep(2000);
                     return;
                 }
 
@@ -93,7 +93,7 @@ namespace BuildServer
                 if (emailPassword.Count != 1 || string.IsNullOrEmpty(emailPassword[0].InnerText))
                 {
                     Console.WriteLine("No Server Email Password in Settings File.");
-                    Thread.Sleep(2);
+                    Thread.Sleep(2000);
                     return;
                 }
 

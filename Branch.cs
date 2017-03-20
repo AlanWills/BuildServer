@@ -39,19 +39,10 @@ namespace BuildServer
             LogFilePath = Path.Combine(Environment.CurrentDirectory, BranchName, "BuildLog.txt");
         }
 
-        public void Build(string email, string notifySetting)
+        public void Build()
         {
             lock (branchLock)
             {
-                if (!Notifiers.ContainsKey(email))
-                {
-                    Notifiers.Add(email, new User(email, notifySetting));
-                }
-                else
-                {
-                    Notifiers[email].NotifySettingString = notifySetting;
-                }
-
                 if (Building)
                 {
                     // If we're already building, we don't build again
@@ -92,6 +83,23 @@ namespace BuildServer
                     Building = false;
                 }
             });
+        }
+
+        public void Build(string email, string notifySetting)
+        {
+            lock (branchLock)
+            {
+                if (!Notifiers.ContainsKey(email))
+                {
+                    Notifiers.Add(email, new User(email, notifySetting));
+                }
+                else
+                {
+                    Notifiers[email].NotifySettingString = notifySetting;
+                }
+            }
+
+            Build();
         }
 
         /// <summary>

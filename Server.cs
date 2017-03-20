@@ -1,18 +1,9 @@
 ﻿using BuildServerUtils;
-using Microsoft.Build.Evaluation;
-using Microsoft.Build.Execution;
-using Microsoft.Build.Logging;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Net;
-using System.Net.Mail;
-using System.Text;
+using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Xml;
-using static BuildServer.Branch;
 
 namespace BuildServer
 {
@@ -25,28 +16,37 @@ namespace BuildServer
         /// </summary>
         private Dictionary<string, Branch> Branches { get; set; } = new Dictionary<string, Branch>();
 
+        private Timer Timer { get; set; }
+
         #endregion
 
         public Server(int port = 1490) : 
             base(port)
         {
+            TimeSpan timeUntilMidnight = (DateTime.Today + TimeSpan.FromDays(1)) - DateTime.Now;
+            Timer = new Timer(NightlyBuild_DoWork, null, timeUntilMidnight, TimeSpan.FromDays(1));
         }
 
+        private void NightlyBuild_DoWork(object state)
+        {
+            foreach (Branch branch in Branches.Values)
+            {
+                branch.Build();
+            }
+        }
+        
         protected override void ProcessMessage(byte[] data)
         {
-            Task.Factory.StartNew(() =>
+            base.ProcessMessage(data);
+
+            string[] strings = data.ConvertToString().Split(',');
+
+            if (strings.Length == 4 && strings[0] == "Request Build")
             {
-                base.ProcessMessage(data);
+                Console.WriteLine("Request Received for " + strings[1]);
 
-                string[] strings = data.ConvertToString().Split(',');
-
-                if (strings.Length == 4 && strings[0] == "Request Build")
-                {
-                    Console.WriteLine("Request Received for " + strings[1]);
-
-                    TestProject("GrowDesktop", strings[1], strings[2], strings[3]);
-                }
-            });
+                TestProject("GrowDesktop", strings[1], strings[2], strings[3]);
+            }
         }
 
         /// <summary>
