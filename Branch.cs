@@ -23,6 +23,8 @@ namespace BuildServer
 
         private bool Building { get; set; }
 
+        private bool Queued { get; set; }
+
         private string BranchName { get; set; }
 
         private string LogFilePath { get; set; }
@@ -45,12 +47,19 @@ namespace BuildServer
             {
                 if (Building)
                 {
-                    // If we're already building, we don't build again
+                    // If we're already building, we don't build again but queue another
+                    Queued = true;
+                    Console.WriteLine("Build already underway so another will be queued");
+
                     return;
                 }
 
                 // Now set the branch to be building
                 Building = true;
+
+                // If we weren't queued, it doesn't matter
+                // If we were queued, we are now building so we shouldn't be any more
+                Queued = false;
             }
 
             // Build and test in separate task to not block main build server from testing other projects
@@ -77,10 +86,17 @@ namespace BuildServer
                 // This will change directory out of checked out branch again
                 ReadFilesAndSendMessage();
 
+                bool queued = false;
                 lock (branchLock)
                 {
                     // Now set the branch to be finished building
                     Building = false;
+                    queued = Queued;
+                }
+
+                if (queued)
+                {
+                    Build();
                 }
             });
         }
