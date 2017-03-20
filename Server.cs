@@ -1,6 +1,7 @@
 ﻿using BuildServerUtils;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 
 namespace BuildServer
@@ -37,13 +38,22 @@ namespace BuildServer
         {
             base.ProcessMessage(data);
 
-            string[] strings = data.ConvertToString().Split(',');
+            List<string> strings = data.ConvertToString().Split(',').ToList();
 
-            if (strings.Length == 4 && strings[0] == "Request Build")
+            while (strings.Count > 0)
             {
-                Console.WriteLine("Request Received for " + strings[1]);
+                // Use virtual classes here?
+                switch (strings[0])
+                {
+                    case BuildServerCommands.BuildCommand:
+                        if (strings[0] == BuildServerCommands.BuildCommand)
+                        {
+                            Console.WriteLine("Request Received for " + strings[1]);
 
-                TestProject("GrowDesktop", strings[1], strings[2], strings[3]);
+                            TestProject("GrowDesktop", strings[1], strings[2], strings[3]);
+                        }
+                        break;
+                }
             }
         }
 
