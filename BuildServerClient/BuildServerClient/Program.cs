@@ -10,7 +10,9 @@ namespace BuildServerClient
     {
         static void Main(string[] args)
         {
-            string settingsFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Dev Tools", "Git Hooks", "Build Server", "Settings.xml");
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+
+            string settingsFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Settings.xml");
             if (!File.Exists(settingsFilePath))
             {
                 Console.WriteLine("No Settings File.");
@@ -29,6 +31,8 @@ namespace BuildServerClient
                 return;
             }
 
+            Console.WriteLine("ServerIP = " + serverIP[0].InnerText);
+
             XmlNodeList serverPort = document.GetElementsByTagName("ServerPort");
             if (serverPort.Count != 1 || string.IsNullOrEmpty(serverPort[0].InnerText))
             {
@@ -45,6 +49,8 @@ namespace BuildServerClient
                 return;
             }
 
+            Console.WriteLine("ServerPort = " + port);
+
             Client client = new Client(serverIP[0].InnerText, port);
 
             string branchName = "";
@@ -60,7 +66,13 @@ namespace BuildServerClient
                 string notifySetting = notifySettings.Count == 1 && !string.IsNullOrEmpty(notifySettings[0].InnerText) ? notifySettings[0].InnerText : "Y";
 
                 client.ServerComms.Send("Request Build," + branchName + "," + emails[0].InnerText + "," + notifySetting);
+                Console.WriteLine("Build Request sent");
             }
+        }
+
+        private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            Console.WriteLine("Exception occurred with message: " + (e.ExceptionObject as Exception).Message);
         }
     }
 }

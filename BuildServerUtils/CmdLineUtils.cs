@@ -21,11 +21,11 @@ namespace BuildServerUtils
         /// <param name="commandAndArgs"></param>
         /// <param name="onCommandCompleteCallback"></param>
         /// <returns></returns>
-        public static void PerformCommand(string fileName, string commandAndArgs, EventHandler onCommandCompleteCallback = null)
+        public static void PerformCommand(string fileName, string args = "", TextWriter outputWriter = null, EventHandler onCommandCompleteCallback = null)
         {
-            ProcessStartInfo cmdInfo = CreateCmdLineProcessStartInfo(commandAndArgs);
+            ProcessStartInfo cmdInfo = CreateCmdLineProcessStartInfo(args, outputWriter != null);
             cmdInfo.FileName = fileName;
-            RunProcess(cmdInfo, onCommandCompleteCallback);
+            RunProcess(cmdInfo, onCommandCompleteCallback, outputWriter);
         }
 
         /// <summary>
@@ -34,15 +34,19 @@ namespace BuildServerUtils
         /// </summary>
         /// <param name="arguments"></param>
         /// <returns></returns>
-        public static ProcessStartInfo CreateCmdLineProcessStartInfo(string arguments = "")
+        public static ProcessStartInfo CreateCmdLineProcessStartInfo(string arguments = "", bool redirectOutput = false)
         {
             ProcessStartInfo cmdInfo = new ProcessStartInfo();
-            //cmdInfo.CreateNoWindow = true;
-            //cmdInfo.RedirectStandardError = true;
-            //cmdInfo.RedirectStandardOutput = true;
             cmdInfo.UseShellExecute = false;
             cmdInfo.Arguments = arguments;
             cmdInfo.WorkingDirectory = Directory.GetCurrentDirectory();
+
+            if (redirectOutput)
+            {
+                cmdInfo.CreateNoWindow = true;
+                cmdInfo.RedirectStandardError = true;
+                cmdInfo.RedirectStandardOutput = true;
+            }
 
             return cmdInfo;
         }
@@ -52,12 +56,16 @@ namespace BuildServerUtils
         /// </summary>
         /// <param name="processInfo"></param>
         /// <param name="onCommandCompleteCallback"></param>
-        private static void RunProcess(ProcessStartInfo processInfo, EventHandler onCommandCompleteCallback)
+        private static void RunProcess(ProcessStartInfo processInfo, EventHandler onCommandCompleteCallback, TextWriter outputWriter = null)
         {
             Process process = new Process();
             process.StartInfo = processInfo;
-            //process.ErrorDataReceived += PrintToCommandLine;
-            //process.OutputDataReceived += PrintToCommandLine;
+
+            if (outputWriter != null)
+            {
+                process.OutputDataReceived += (object sender, DataReceivedEventArgs e) => { outputWriter.WriteLine(e.Data); };
+                process.ErrorDataReceived += (object sender, DataReceivedEventArgs e) => { outputWriter.WriteLine(e.Data); };
+            }
 
             if (onCommandCompleteCallback != null)
             {
@@ -65,16 +73,15 @@ namespace BuildServerUtils
             }
 
             process.Start();
-            //process.BeginErrorReadLine();
-            //process.BeginOutputReadLine();
+
+            if (outputWriter != null)
+            {
+                process.BeginErrorReadLine();
+                process.BeginOutputReadLine();
+            }
 
             process.WaitForExit();
             process.Close();
-        }
-
-        private static void PrintToCommandLine(object sender, DataReceivedEventArgs e)
-        {
-            Console.WriteLine(e.Data);
         }
     }
 }

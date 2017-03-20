@@ -80,22 +80,33 @@ namespace BuildServer
                 Branches[branchName] = BuildState.kBuilding;
             }
 
-            // This will change directory into the checked out branch
-            CheckoutBranch(projectGithubRepoName, branchName);
-            
-            CmdLineUtils.PerformCommand("\"" + Path.Combine("Dev Tools", "Git Hooks", "Build Server", "compile.bat") + "\"", "");
-            CmdLineUtils.PerformCommand("\"" + Path.Combine("Dev Tools", "Git Hooks", "Build Server", "run_tests.bat") + "\"", "");
+            // Redirect output into file
+            string logFilePath = Path.Combine(Environment.CurrentDirectory, branchName, "BuildLog.txt");
+            using (FileStream stream = File.Open(logFilePath, FileMode.Create))
+            {
+                using (StreamWriter writer = new StreamWriter(stream))
+                {
+                    writer.AutoFlush = true;
 
-            ReadFilesAndSendMessage(branchName, email, notifySetting);
+                    // This will change directory into the checked out branch
+                    CheckoutBranch(projectGithubRepoName, branchName, writer);
+
+                    CmdLineUtils.PerformCommand("\"" + Path.Combine("Dev Tools", "Git Hooks", "Build Server", "compile.bat") + "\"");
+                    Console.WriteLine("Build of " + branchName + " completed");
+
+                    CmdLineUtils.PerformCommand("\"" + Path.Combine("Dev Tools", "Git Hooks", "Build Server", "run_tests.bat") + "\"", outputWriter:writer);
+                    Console.WriteLine("Testing of " + branchName + " completed");
+                }
+            }
+
+            // This will change directory out of checked out branch again
+            ReadFilesAndSendMessage(logFilePath, branchName, email, notifySetting);
 
             lock (branchesLock)
             {
                 // Now set the branch to be not building
                 Branches[branchName] = BuildState.kNotBuilding;
             }
-
-            // Move back out of the checked out branch
-            Environment.CurrentDirectory = Directory.GetParent(Environment.CurrentDirectory).FullName;
         }
 
         /// <summary>
@@ -104,20 +115,23 @@ namespace BuildServer
         /// </summary>
         /// <param name="projectGithubRepoName"></param>
         /// <param name="branchName"></param>
-        private void CheckoutBranch(string projectGithubRepoName, string branchName)
+        private void CheckoutBranch(string projectGithubRepoName, string branchName, TextWriter writer)
         {
             string repoDir = Path.Combine(Environment.CurrentDirectory, branchName);
 
             if (!Directory.Exists(repoDir))
             {
+                Console.WriteLine("Cloning " + projectGithubRepoName + " into repoDir");
                 // Clone the branch if we do not have it checked out
-                CmdLineUtils.PerformCommand(CmdLineUtils.Git, "clone -b " + branchName + " --single-branch https://github.com/GrowSoftware/" + projectGithubRepoName + ".git " + branchName);
+                CmdLineUtils.PerformCommand(CmdLineUtils.Git, "clone -b " + branchName + " --single-branch https://github.com/GrowSoftware/" + projectGithubRepoName + ".git " + branchName, writer);
             }
 
             // Change current directory and update the branch
             Environment.CurrentDirectory = repoDir;
-            CmdLineUtils.PerformCommand(CmdLineUtils.Git, "pull");
+            Console.WriteLine("Making " + branchName + " up to date");
+            CmdLineUtils.PerformCommand(CmdLineUtils.Git, "pull", writer);
 
+            writer.WriteLine("Checkout of " + branchName + " completed");
             Console.WriteLine("Checkout of " + branchName + " completed");
         }
 
@@ -126,7 +140,7 @@ namespace BuildServer
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void ReadFilesAndSendMessage(string branchName, string email, string notifySetting)
+        private void ReadFilesAndSendMessage(string logFilePath, string branchName, string email, string notifySetting)
         {
             string testResults = Path.Combine(Environment.CurrentDirectory, "TestResults");
             if (!Directory.Exists(testResults))
@@ -159,11 +173,19 @@ namespace BuildServer
 
             Directory.Delete(testResults, true);
 
+            // Move back out of the checked out branch
+            Console.WriteLine("Moving out of " + branchName);
+            Environment.CurrentDirectory = Directory.GetParent(Environment.CurrentDirectory).FullName;
+            Console.WriteLine("Current directory now " + Environment.CurrentDirectory);
+
             // "Y" means only email on fail
             if (!passed || notifySetting != "Y")
             {
-                Message(messageContents, branchName, email, passed);
-                Console.WriteLine("Message sent to " + email);
+                Message(logFilePath, messageContents, branchName, email, passed);
+            }
+            else
+            {
+                Console.WriteLine("Skipping message because the build passed and the user indicated not to email them.");
             }
 
             Console.WriteLine("Testing run complete");
@@ -173,12 +195,14 @@ namespace BuildServer
         /// Either sends back via comms or emails the inputted string in the string builder to me if there is no connection
         /// </summary>
         /// <param name="testRunInformation"></param>
-        private void Message(StringBuilder testRunInformation, string branchName, string email, bool passed)
+        private void Message(string logFilePath, StringBuilder testRunInformation, string branchName, string email, bool passed)
         {
-            string settingsFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Settings.xml");
+            Console.WriteLine("Reading settings file");
+
+            string settingsFilePath = Path.Combine(Environment.CurrentDirectory, "Settings.xml");
             if (!File.Exists(settingsFilePath))
             {
-                Console.WriteLine("No Settings File.");
+                Console.WriteLine("No Settings.xml File found in " + settingsFilePath);
                 Thread.Sleep(2);
                 return;
             }
@@ -194,6 +218,8 @@ namespace BuildServer
                 return;
             }
 
+            Console.WriteLine("ServerEmail = " + serverEmail[0].InnerText);
+
             XmlNodeList emailUsername = document.GetElementsByTagName("ServerEmailUsername");
             if (emailUsername.Count != 1 || string.IsNullOrEmpty(emailUsername[0].InnerText))
             {
@@ -201,6 +227,8 @@ namespace BuildServer
                 Thread.Sleep(2);
                 return;
             }
+
+            Console.WriteLine("ServerEmailUsername = " + emailUsername[0].InnerText);
 
             XmlNodeList emailPassword = document.GetElementsByTagName("ServerEmailPassword");
             if (emailPassword.Count != 1 || string.IsNullOrEmpty(emailPassword[0].InnerText))
@@ -210,20 +238,33 @@ namespace BuildServer
                 return;
             }
 
+            Console.WriteLine("ServerEmailPassword = " + emailPassword[0].InnerText);
+            Console.WriteLine("Creating message");
+
             DateTime buildCompleteTime = DateTime.Now;
 
             testRunInformation.AppendLine();
             testRunInformation.Append("Build Request completed at " + buildCompleteTime.ToShortTimeString());
 
-            MailMessage mail = new MailMessage(serverEmail[0].InnerText, email, (branchName + " - ") + (passed ? "Build Passed" : "Build Failed"), testRunInformation.ToString());
-            SmtpClient client = new SmtpClient("smtp.gmail.com", 587);
-            
-            client.Port = 587;
-            client.UseDefaultCredentials = false;
-            client.Credentials = new NetworkCredential(emailUsername[0].InnerText, emailPassword[0].InnerText);
-            client.EnableSsl = true;
+            try
+            {
+                MailMessage mail = new MailMessage(serverEmail[0].InnerText, email, (branchName + " - ") + (passed ? "Build Passed" : "Build Failed"), testRunInformation.ToString());
 
-            client.Send(mail);
+                Console.WriteLine("Attaching log from file " + logFilePath);
+                mail.Attachments.Add(new Attachment(logFilePath));
+
+                SmtpClient client = new SmtpClient("smtp.gmail.com", 587);
+                client.UseDefaultCredentials = false;
+                client.Credentials = new NetworkCredential(emailUsername[0].InnerText, emailPassword[0].InnerText);
+                client.EnableSsl = true;
+
+                client.Send(mail);
+                Console.WriteLine("Message sent to " + email);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error occurred in sending email with message: " + e.Message);
+            }
         }
     }
 }
