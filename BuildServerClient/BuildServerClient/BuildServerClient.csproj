@@ -52,8 +52,9 @@
   <ItemGroup>
     <Compile Include="Client.cs" />
     <Compile Include="ClientSettings.cs" />
+    <Compile Include="Commands\BuildBranchCommand.cs" />
     <Compile Include="Commands\BuildCurrentBranchCommand.cs" />
-    <Compile Include="Commands\DisconnectClientCommand.cs" />
+    <Compile Include="Commands\QuitCommand.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

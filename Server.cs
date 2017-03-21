@@ -69,19 +69,19 @@ namespace BuildServer
             base.ProcessMessage(data);
 
             string dataString = data.ConvertToString();
-            Console.WriteLine("Received command: " + dataString);
+            Console.WriteLine("Command received: " + dataString);
+
+            List<string> parameters = dataString.Split(' ').ToList();
+            parameters.RemoveAll(x => string.IsNullOrWhiteSpace(x));
 
             foreach (KeyValuePair<string, IServerCommand> command in CommandRegistry)
             {
-                if (dataString.StartsWith(command.Key))
+                if (parameters[0] == command.Key)
                 {
-                    if (ClientComms.IsConnected)
-                    {
-                        ClientComms.Send("Received command: " + dataString);
-                    }
+                    parameters.RemoveAt(0);
 
                     // Remove command string
-                    command.Value.Execute(this, dataString.Substring(command.Key.Length));
+                    command.Value.Execute(this, parameters);
                 }
             }
         }

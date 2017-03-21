@@ -2,6 +2,7 @@
 using LibGit2Sharp;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -12,6 +13,8 @@ namespace BuildServerClient
 {
     class Program
     {
+        public static bool Running = true;
+
         private static Dictionary<string, IClientCommand> CommandRegistry = new Dictionary<string, IClientCommand>();
 
         static void Main(string[] args)
@@ -20,40 +23,60 @@ namespace BuildServerClient
 
             if (args.Length < 1)
             {
-                Console.WriteLine("No settings file relative path passed in to executable.");
-                Thread.Sleep(2000);
+                Console.WriteLine("No settings file relative path passed in to executable.  You will have to pass settings in to commands manually.");
+            }
+            else
+            {
+                ClientSettings.ReadFile(Path.Combine(Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName, args[0]));
+            }
+
+            Client client = new Client(ClientSettings.ServerIP, ClientSettings.ServerPort);
+
+            if (client.ServerComms == null || !client.ServerComms.IsConnected)
+            {
+                Console.WriteLine("Connection to build server failed");
                 return;
             }
+
+            Console.WriteLine("\nReady");
 
             foreach (Type type in Assembly.GetExecutingAssembly().GetTypes().Where(x => x.GetCustomAttribute<CommandAttribute>() != null))
             {
                 CommandRegistry.Add(type.GetCustomAttribute<CommandAttribute>().Token, Activator.CreateInstance(type) as IClientCommand);
+
+                // Debugging registered commands
+                //Console.WriteLine("Found command " + type.GetCustomAttribute<CommandAttribute>().Token);
             }
 
-            ClientSettings.ReadFile(Path.Combine(Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName, args[0]));
-            Client client = new Client(ClientSettings.ServerIP, ClientSettings.ServerPort);
-            Console.WriteLine("\nReady");
-
-            while (true)
+            while (Running)
             {
-                string command = Console.ReadLine();
-                if (command == "quit")
+                // Remove all whitespace
+                string commandInput = Console.ReadLine();
+                if (!string.IsNullOrWhiteSpace(commandInput))
                 {
-                    // Move to command
-                    client.ServerComms.Send("quit");
-                    client.ServerComms.Disconnect();
-                    return;
-                }
+                    bool found = false;
 
-                foreach (KeyValuePair<string, IClientCommand> commandPair in CommandRegistry)
-                {
-                    if (command.StartsWith(commandPair.Key))
+                    List<string> parameters = commandInput.Split(' ').ToList();
+                    parameters.RemoveAll(x => string.IsNullOrWhiteSpace(x));
+
+                    Debug.Assert(parameters.Count > 0);
+
+                    foreach (KeyValuePair<string, IClientCommand> commandPair in CommandRegistry)
                     {
-                        commandPair.Value.Execute(client);
-                        break;
+                        if (parameters[0] == commandPair.Key)
+                        {
+                            parameters.RemoveAt(0);
+                            commandPair.Value.Execute(client, parameters);
+                            found = true;
+
+                            break;
+                        }
                     }
 
-                    Console.WriteLine("Unrecognized command: '" + command + "'");
+                    if (!found)
+                    {
+                        Console.WriteLine("Unrecognized command: '" + commandInput + "'");
+                    }
                 }
             }
         }

@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace BuildServer
 {
-    [Command(CommandStrings.DisconnectClient)]
+    [Command(CommandStrings.Quit)]
     public class DisconnectClientCommand : IServerCommand
     {
-        public void Execute(BaseServer server, string arguments)
+        public void Execute(BaseServer server, List<string> arguments)
         {
             server.ClientComms.Disconnect();
         }

@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildServer", "BuildServer.csproj", "{2241BAF3-DB17-43EA-9B49-60788275DBA9}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D3A8D13F-408F-4601-9E5F-7D22D96F0D79} = {D3A8D13F-408F-4601-9E5F-7D22D96F0D79}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildServerUtils", "BuildServerUtils\BuildServerUtils.csproj", "{12A3F3FC-300C-4792-B987-282C123B8925}"
 EndProject

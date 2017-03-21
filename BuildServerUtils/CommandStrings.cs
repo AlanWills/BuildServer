@@ -9,6 +9,6 @@ namespace BuildServerUtils
     public static class CommandStrings
     {
         public const string BuildBranch = "build";
-        public const string DisconnectClient = "quit";
+        public const string Quit = "quit";
     }
 }

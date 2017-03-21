@@ -50,7 +50,7 @@ namespace BuildServerUtils
 
         public void Disconnect()
         {
-            Client.Close();
+            Client?.Close();
         }
 
         #region Data Sending Functions
@@ -62,7 +62,7 @@ namespace BuildServerUtils
         /// <param name="str"></param>
         public void Send(string str)
         {
-            if (!string.IsNullOrEmpty(str))
+            if (!string.IsNullOrWhiteSpace(str))
             {
                 SendByteArray(Encoding.UTF8.GetBytes(str));
             }

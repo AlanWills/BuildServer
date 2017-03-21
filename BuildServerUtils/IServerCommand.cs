@@ -8,6 +8,6 @@ namespace BuildServerUtils
 {
     public interface IServerCommand
     {
-        void Execute(BaseServer baseServer, string arguments);
+        void Execute(BaseServer baseServer, List<string> arguments);
     }
 }

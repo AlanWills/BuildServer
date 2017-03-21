@@ -8,6 +8,6 @@ namespace BuildServerUtils
 {
     public interface IClientCommand
     {
-        void Execute(BaseClient client);
+        void Execute(BaseClient client, List<string> parameters);
     }
 }

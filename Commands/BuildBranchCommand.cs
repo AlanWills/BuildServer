@@ -8,34 +8,37 @@ namespace BuildServer
     [Command(CommandStrings.BuildBranch)]
     public class BuildCurrentBranchCommand : IServerCommand
     {
-        public void Execute(BaseServer baseServer, string arguments)
+        public void Execute(BaseServer baseServer, List<string> arguments)
         {
             Server server = baseServer as Server;
 
-            List<string> strings = arguments.Split(' ').ToList();
-            strings.RemoveAll(x => string.IsNullOrEmpty(x));
-
-            if (strings.Count != 3)
+            if (arguments.Count != 3)
             {
                 Console.WriteLine("Not enough parameters to build command");
                 return;
             }
 
-            string branchName = strings[0];
+            string branchName = arguments[0];
             Console.WriteLine("Branch name = " + branchName);
 
-            string email = strings[1];
+            string email = arguments[1];
             Console.WriteLine("Email = " + email);
 
-            string notifySetting = strings[2];
+            string notifySetting = arguments[2];
             Console.WriteLine("NotifySetting = " + notifySetting);
 
-            if (!server.Branches.ContainsKey(branchName))
+            if (baseServer.ClientComms.IsConnected)
             {
-                server.Branches.Add(branchName, new Branch(branchName));
+                // Notify the user
+                baseServer.ClientComms.Send("Build Command received by Build Server");
             }
 
-            server.Branches[branchName].Build(email, notifySetting);
+            //if (!server.Branches.ContainsKey(branchName))
+            //{
+            //    server.Branches.Add(branchName, new Branch(branchName));
+            //}
+
+            //server.Branches[branchName].Build(email, notifySetting);
         }
     }
 }

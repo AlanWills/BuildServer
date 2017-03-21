@@ -13,7 +13,11 @@ namespace BuildServerClient
 
         protected override void OnMessageReceived(byte[] data)
         {
-            Console.WriteLine(data.ConvertToString());
+            string dataString = data.ConvertToString();
+            if (!string.IsNullOrWhiteSpace(dataString))
+            {
+                Console.WriteLine(data.ConvertToString());
+            }
         }
     }
 }
