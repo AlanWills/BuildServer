@@ -14,16 +14,16 @@ namespace BuildServer
         #region Properties and Fields
 
         /// <summary>
-        /// A dictionary of all the branches that are available and their current build state.
-        /// </summary>
-        private Dictionary<string, Branch> Branches { get; set; } = new Dictionary<string, Branch>();
-
-        private Timer Timer { get; set; }
-
-        /// <summary>
         /// A dictionary of all the commands we have registered
         /// </summary>
         private Dictionary<string, IServerCommand> CommandRegistry { get; set; } = new Dictionary<string, IServerCommand>();
+
+        /// <summary>
+        /// A dictionary of all the branches that are available and their current build state.
+        /// </summary>
+        public Dictionary<string, Branch> Branches { get; private set; } = new Dictionary<string, Branch>();
+
+        private Timer Timer { get; set; }
 
         #endregion
 
@@ -71,25 +71,19 @@ namespace BuildServer
             string dataString = data.ConvertToString();
             Console.WriteLine("Received command: " + dataString);
 
-            if (ClientComms.IsConnected)
+            foreach (KeyValuePair<string, IServerCommand> command in CommandRegistry)
             {
-                ClientComms.Send("Received command: " + dataString);
-            }
-        }
+                if (dataString.StartsWith(command.Key))
+                {
+                    if (ClientComms.IsConnected)
+                    {
+                        ClientComms.Send("Received command: " + dataString);
+                    }
 
-        /// <summary>
-        /// Clones the repository, runs the tests and then when the process has finished, reads the log file and emails the results
-        /// </summary>
-        /// <param name="projectDirectoryPath"></param>
-        /// <param name="projectExeName"></param>
-        private void TestProject(string projectGithubRepoName, string branchName, string email, string notifySetting)
-        {
-            if (!Branches.ContainsKey(branchName))
-            {
-                Branches.Add(branchName, new Branch(branchName));
+                    // Remove command string
+                    command.Value.Execute(this, dataString.Substring(command.Key.Length));
+                }
             }
-
-            Branches[branchName].Build(email, notifySetting);
         }
     }
 }

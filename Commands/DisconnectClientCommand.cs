@@ -10,7 +10,7 @@ namespace BuildServer
     [Command(CommandStrings.DisconnectClient)]
     public class DisconnectClientCommand : IServerCommand
     {
-        public void Execute(BaseServer server)
+        public void Execute(BaseServer server, string arguments)
         {
             server.ClientComms.Disconnect();
         }
