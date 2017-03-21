@@ -10,11 +10,17 @@ namespace BuildServerClient
     {
         #region Properties and Fields
 
+        public const string ServerIPName = "ServerIP";
         public static string ServerIP { get; private set; }
 
+        public const string ServerPortName = "ServerPort";
         public static int ServerPort { get; private set; }
 
+        public const string EmailName = "Email";
         public static string Email { get; private set; }
+
+        public const string NotifySettingName = "OnlyEmailOnFail";
+        public static string NotifySetting { get; private set; }
 
         public static string CurrentBranch
         {
@@ -30,8 +36,6 @@ namespace BuildServerClient
                 catch { return "Not A Git Repo"; }
             }
         }
-
-        public static string NotifySetting { get; private set; }
 
         #endregion
 
@@ -51,7 +55,7 @@ namespace BuildServerClient
 
             // Server IP
             {
-                XmlNodeList serverIP = document.GetElementsByTagName("ServerIP");
+                XmlNodeList serverIP = document.GetElementsByTagName(ServerIPName);
                 if (serverIP.Count != 1 || string.IsNullOrEmpty(serverIP[0].InnerText))
                 {
                     Console.WriteLine("No Server IP in Settings File.");
@@ -65,7 +69,7 @@ namespace BuildServerClient
 
             // Server port
             {
-                XmlNodeList serverPort = document.GetElementsByTagName("ServerPort");
+                XmlNodeList serverPort = document.GetElementsByTagName(ServerPortName);
                 if (serverPort.Count != 1 || string.IsNullOrEmpty(serverPort[0].InnerText))
                 {
                     Console.WriteLine("No Server Port in Settings File.");
@@ -87,7 +91,7 @@ namespace BuildServerClient
 
             // Email
             {
-                XmlNodeList emails = document.GetElementsByTagName("Email");
+                XmlNodeList emails = document.GetElementsByTagName(EmailName);
                 if (emails.Count != 1 && string.IsNullOrEmpty(emails[0].InnerText))
                 {
                     Console.WriteLine("No Email in Settings file.");
@@ -101,7 +105,7 @@ namespace BuildServerClient
 
             // Notify setting
             {
-                XmlNodeList notifySettings = document.GetElementsByTagName("OnlyEmailOnFail");
+                XmlNodeList notifySettings = document.GetElementsByTagName(NotifySettingName);
                 if (notifySettings.Count != 1 && string.IsNullOrEmpty(notifySettings[0].InnerText))
                 {
                     Console.WriteLine("No OnlyEmailOnFail in Settings file.");

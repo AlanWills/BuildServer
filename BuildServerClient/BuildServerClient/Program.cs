@@ -15,7 +15,7 @@ namespace BuildServerClient
     {
         public static bool Running = true;
 
-        private static Dictionary<string, IClientCommand> CommandRegistry = new Dictionary<string, IClientCommand>();
+        public static Dictionary<string, IClientCommand> CommandRegistry { get; private set; } = new Dictionary<string, IClientCommand>();
 
         static void Main(string[] args)
         {

@@ -10,5 +10,8 @@ namespace BuildServerUtils
     {
         public const string BuildBranch = "build";
         public const string Quit = "quit";
+        public const string GetBranchStatus = "status";
+        public const string Help = "help";
+        public const string Settings = "settings";
     }
 }

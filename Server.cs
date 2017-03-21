@@ -82,6 +82,8 @@ namespace BuildServer
 
                     // Remove command string
                     command.Value.Execute(this, parameters);
+
+                    break;
                 }
             }
         }

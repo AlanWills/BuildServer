@@ -8,6 +8,11 @@ namespace BuildServerClient
     [Command(CommandStrings.Quit)]
     public class QuitCommand : IClientCommand
     {
+        public string Description
+        {
+            get { return "Quit the client"; }
+        }
+
         public void Execute(BaseClient client, List<string> parameters)
         {
             client.ServerComms.Send(CommandStrings.Quit);
