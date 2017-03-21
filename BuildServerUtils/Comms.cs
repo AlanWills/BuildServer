@@ -20,6 +20,8 @@ namespace BuildServerUtils
         private BinaryReader Reader { get; set; }
         private BinaryWriter Writer { get; set; }
 
+        public bool IsConnected { get { return Client != null ? Client.Connected : false; } }
+
         /// <summary>
         /// Useful buffer for reading packeted messages from the server
         /// </summary>
@@ -29,11 +31,6 @@ namespace BuildServerUtils
         /// An event that is fired when this Comms receives a message
         /// </summary>
         public event OnDataReceived OnDataReceived;
-
-        /// <summary>
-        /// An event that is fired when this Comms can no longer communicate with the client sending it messages
-        /// </summary>
-        public event OnDisconnect OnDisconnect;
 
         #endregion
 
@@ -51,6 +48,11 @@ namespace BuildServerUtils
             StartListening();
         }
 
+        public void Disconnect()
+        {
+            Client.Close();
+        }
+
         #region Data Sending Functions
 
         /// <summary>
@@ -60,7 +62,10 @@ namespace BuildServerUtils
         /// <param name="str"></param>
         public void Send(string str)
         {
-            SendByteArray(Encoding.UTF8.GetBytes(str));
+            if (!string.IsNullOrEmpty(str))
+            {
+                SendByteArray(Encoding.UTF8.GetBytes(str));
+            }
         }
 
         /// <summary>
@@ -70,6 +75,8 @@ namespace BuildServerUtils
         /// <param name="bytes"></param>
         protected void SendByteArray(byte[] bytes)
         {
+            if (bytes.Length == 0) { return; }
+
             Writer.Write(bytes);
 
             int bytesWritten = (int)WriteStream.Position;
@@ -98,7 +105,7 @@ namespace BuildServerUtils
             }
             catch
             {
-                OnDisconnect?.Invoke();
+                
             }
         }
 

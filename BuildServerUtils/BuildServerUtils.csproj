@@ -40,10 +40,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attributes.cs" />
     <Compile Include="BaseClient.cs" />
     <Compile Include="BaseServer.cs" />
-    <Compile Include="BuildServer\Delegates.cs" />
     <Compile Include="CmdLineUtils.cs" />
+    <Compile Include="CommandStrings.cs" />
+    <Compile Include="IClientCommand.cs" />
+    <Compile Include="IServerCommand.cs" />
     <Compile Include="Comms.cs" />
     <Compile Include="Delegates.cs" />
     <Compile Include="ExtensionFunctions.cs" />

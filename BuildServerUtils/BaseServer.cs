@@ -55,7 +55,7 @@ namespace BuildServerUtils
 
             ListenForNewClient();
         }
-
+        
         #region Message Callbacks
 
         /// <summary>

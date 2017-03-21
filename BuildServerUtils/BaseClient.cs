@@ -28,7 +28,8 @@ namespace BuildServerUtils
             {
                 ServerComms = new Comms(new TcpClient(ipAddress, portNumber));
                 ServerComms.OnDataReceived += OnMessageReceived;
-                ServerComms.OnDisconnect += OnServerDisconnect;
+
+                Console.WriteLine("Connection succeeded");
             }
             catch (Exception e)
             {
@@ -45,12 +46,7 @@ namespace BuildServerUtils
         /// </summary>
         /// <param name="data"></param>
         protected virtual void OnMessageReceived(byte[] data) { }
-
-        /// <summary>
-        /// A function called when this client can no longer communicate to the server it is connected to
-        /// </summary>
-        protected virtual void OnServerDisconnect() { }
-
+        
         #endregion
     }
 }

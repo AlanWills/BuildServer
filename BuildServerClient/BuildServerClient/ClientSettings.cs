@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using LibGit2Sharp;
+using System;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Xml;
 
 namespace BuildServerClient
@@ -18,6 +15,21 @@ namespace BuildServerClient
         public static int ServerPort { get; private set; }
 
         public static string Email { get; private set; }
+
+        public static string CurrentBranch
+        {
+            get
+            {
+                try
+                {
+                    using (Repository repo = new Repository(Directory.GetCurrentDirectory()))
+                    {
+                        return repo.Head.FriendlyName;
+                    }
+                }
+                catch { return "Not A Git Repo"; }
+            }
+        }
 
         public static string NotifySetting { get; private set; }
 

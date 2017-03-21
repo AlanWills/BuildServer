@@ -1,7 +1,10 @@
 ﻿using BuildServerUtils;
+using LibGit2Sharp;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 
 namespace BuildServer
@@ -17,13 +20,25 @@ namespace BuildServer
 
         private Timer Timer { get; set; }
 
+        /// <summary>
+        /// A dictionary of all the commands we have registered
+        /// </summary>
+        private Dictionary<string, IServerCommand> CommandRegistry { get; set; } = new Dictionary<string, IServerCommand>();
+
         #endregion
 
         public Server(int port = 1490) : 
             base(port)
         {
+            foreach (Type type in Assembly.GetExecutingAssembly().GetTypes().Where(x => x.GetCustomAttribute<CommandAttribute>() != null))
+            {
+                CommandRegistry.Add(type.GetCustomAttribute<CommandAttribute>().Token, Activator.CreateInstance(type) as IServerCommand);
+            }
+
             TimeSpan timeUntilMidnight = (DateTime.Today + TimeSpan.FromDays(1)) - DateTime.Now;
             Timer = new Timer(NightlyBuild_DoWork, null, timeUntilMidnight, TimeSpan.FromDays(1));
+
+            LoadBranches();
         }
 
         private void NightlyBuild_DoWork(object state)
@@ -33,27 +48,32 @@ namespace BuildServer
                 branch.Build();
             }
         }
+
+        private void LoadBranches()
+        {
+            foreach (string directory in Directory.EnumerateDirectories(Directory.GetCurrentDirectory()))
+            {
+                if (Directory.Exists(Path.Combine(directory, ".git")))
+                {
+                    using (Repository repo = new Repository(directory))
+                    {
+                        Console.WriteLine("Discovered branch " + repo.Head.FriendlyName);
+                        Branches.Add(repo.Head.FriendlyName, new Branch(repo.Head.FriendlyName));
+                    }
+                }
+            }
+        }
         
         protected override void ProcessMessage(byte[] data)
         {
             base.ProcessMessage(data);
 
-            List<string> strings = data.ConvertToString().Split(',').ToList();
+            string dataString = data.ConvertToString();
+            Console.WriteLine("Received command: " + dataString);
 
-            while (strings.Count > 0)
+            if (ClientComms.IsConnected)
             {
-                // Use virtual classes here?
-                switch (strings[0])
-                {
-                    case BuildServerCommands.BuildCommand:
-                        if (strings[0] == BuildServerCommands.BuildCommand)
-                        {
-                            Console.WriteLine("Request Received for " + strings[1]);
-
-                            TestProject("GrowDesktop", strings[1], strings[2], strings[3]);
-                        }
-                        break;
-                }
+                ClientComms.Send("Received command: " + dataString);
             }
         }
 
