@@ -26,25 +26,38 @@ namespace BuildServerClient
                 Console.WriteLine(NotifySettingName + ": " + NotifySetting);
             }
 
-            foreach (string parameter in parameters)
+            // Do -1 so we ensure that if we enter the for loop we have the data parameter too
+            for (int i = 0; i < parameters.Count - 1; i += 2)
             {
+                string parameter = parameters[i];
+
                 if (parameter == ServerIPName)
                 {
-                    // Edit
+                    ServerIP = parameters[i + 1];
                 }
                 else if (parameter == ServerPortName)
                 {
-                    // Edit
+                    int port = 0;
+                    if (int.TryParse(parameters[i + 1], out port))
+                    {
+                        ServerPort = port;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Port number was invalid");
+                    }
                 }
                 else if (parameter == EmailName)
                 {
-                    // Edit
+                    Email = parameters[i + 1];
                 }
                 else if (parameter == NotifySettingName)
                 {
-                    // Edit
+                    Email = parameters[i + 1];
                 }
             }
+
+            SaveFile();
         }
     }
 }

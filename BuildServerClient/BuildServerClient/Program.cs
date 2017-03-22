@@ -21,15 +21,7 @@ namespace BuildServerClient
         {
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 
-            if (args.Length < 1)
-            {
-                Console.WriteLine("No settings file relative path passed in to executable.  You will have to manually connect and pass settings in to commands.");
-            }
-            else
-            {
-                ClientSettings.ReadFile(Path.Combine(Directory.GetParent(Assembly.GetExecutingAssembly().Location).FullName, args[0]));
-            }
-
+            ClientSettings.ReadFile();
             Client client = new Client(ClientSettings.ServerIP, ClientSettings.ServerPort);
 
             if (!client.IsConnected)
