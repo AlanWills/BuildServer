@@ -35,7 +35,7 @@ namespace BuildServerClient
                         return repo.Head.FriendlyName;
                     }
                 }
-                catch { return "Not A Git Repo"; }
+                catch { return "Not_A_Repo"; }
             }
         }
 

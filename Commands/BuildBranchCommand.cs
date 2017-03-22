@@ -33,12 +33,12 @@ namespace BuildServer
                 baseServer.ClientComms.Send("Build Command received by Build Server");
             }
 
-            //if (!server.Branches.ContainsKey(branchName))
-            //{
-            //    server.Branches.Add(branchName, new Branch(branchName));
-            //}
+            if (!server.Branches.ContainsKey(branchName))
+            {
+                server.Branches.Add(branchName, new Branch(branchName));
+            }
 
-            //server.Branches[branchName].Build(email, notifySetting);
+            server.Branches[branchName].Build(email, notifySetting);
         }
     }
 }
