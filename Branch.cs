@@ -11,10 +11,11 @@ namespace BuildServer
 {
     public class Branch
     {
-        public enum BuildState
+        public enum TestState
         {
-            kBuilding,
-            kNotBuilding
+            kPassed,
+            kFailed,
+            kUntested
         }
 
         #region Properties and Fields
@@ -24,6 +25,8 @@ namespace BuildServer
         private bool Building { get; set; }
 
         private bool Queued { get; set; }
+
+        public TestState TestingState { get; private set; } = TestState.kUntested;
 
         private string BranchName { get; set; }
 
@@ -186,6 +189,9 @@ namespace BuildServer
 
                 Directory.Delete(testResults, true);
             }
+
+            // Set state of branch
+            TestingState = passed ? TestState.kPassed : TestState.kFailed;
 
             // Move back out of the checked out branch
             Console.WriteLine("Moving out of " + BranchName);

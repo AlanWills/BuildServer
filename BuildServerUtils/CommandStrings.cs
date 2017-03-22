@@ -13,5 +13,6 @@ namespace BuildServerUtils
         public const string GetBranchStatus = "status";
         public const string Help = "help";
         public const string Settings = "settings";
+        public const string Reconnect = "reconnect";
     }
 }

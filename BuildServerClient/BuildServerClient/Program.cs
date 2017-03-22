@@ -23,7 +23,7 @@ namespace BuildServerClient
 
             if (args.Length < 1)
             {
-                Console.WriteLine("No settings file relative path passed in to executable.  You will have to pass settings in to commands manually.");
+                Console.WriteLine("No settings file relative path passed in to executable.  You will have to manually connect and pass settings in to commands.");
             }
             else
             {
@@ -32,10 +32,9 @@ namespace BuildServerClient
 
             Client client = new Client(ClientSettings.ServerIP, ClientSettings.ServerPort);
 
-            if (client.ServerComms == null || !client.ServerComms.IsConnected)
+            if (!client.IsConnected)
             {
-                Console.WriteLine("Connection to build server failed");
-                return;
+                Console.WriteLine("Use 'reconnect' to try again.");
             }
 
             Console.WriteLine("\nReady");

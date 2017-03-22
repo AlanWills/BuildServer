@@ -17,7 +17,7 @@ namespace BuildServerClient
 
         public void Execute(BaseClient client, List<string> parameters)
         {
-            string branchName = parameters.Count > 0 ? parameters[0] : ClientSettings.CurrentBranch;
+            string branchName = (parameters.Count == 0 || parameters[0] == "current") ? ClientSettings.CurrentBranch : parameters[0];
             string email = parameters.Count > 1 ? parameters[1] : ClientSettings.Email;
             string notifySetting = parameters.Count > 2 ? parameters[2] : ClientSettings.NotifySetting;
 

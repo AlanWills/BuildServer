@@ -17,24 +17,49 @@ namespace BuildServerUtils
         /// <summary>
         /// The interface to the server
         /// </summary>
-        public Comms ServerComms { get; private set; }
+        public Comms ServerComms { get; private set; } = new Comms();
+
+        /// <summary>
+        /// Wrapper property for checking that the ServerComms is connected.
+        /// </summary>
+        public bool IsConnected { get { return ServerComms.IsConnected; } }
 
         #endregion
 
         public BaseClient(string ipAddress, int portNumber = 1490)
         {
             // Attempt to connect
+            string error = "";
+            if (TryConnect(ipAddress, portNumber, ref error))
+            {
+                Console.WriteLine("Connection succeeded");
+            }
+            else
+            {
+                Console.WriteLine("Connection failed");
+            }
+        }
+        
+        /// <summary>
+        /// Attempts to connect to the inputted ip through the inputted port.
+        /// </summary>
+        /// <param name="ipAddress"></param>
+        /// <param name="portNumber"></param>
+        /// <param name="errorMessage"></param>
+        /// <returns></returns>
+        public bool TryConnect(string ipAddress, int portNumber, ref string errorMessage)
+        {
             try
             {
-                ServerComms = new Comms(new TcpClient(ipAddress, portNumber));
+                ServerComms.Connect(ipAddress, portNumber);
                 ServerComms.OnDataReceived += OnMessageReceived;
 
-                Console.WriteLine("Connection succeeded");
+                return true;
             }
             catch (Exception e)
             {
-                Console.WriteLine("Connection failed");
-                Console.WriteLine(e.Message);
+                errorMessage = e.Message;
+                return false;
             }
         }
 

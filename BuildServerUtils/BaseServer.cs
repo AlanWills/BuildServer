@@ -66,6 +66,5 @@ namespace BuildServerUtils
         protected virtual void ProcessMessage(byte[] data) { }
 
         #endregion
-
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Net.Sockets;
 using System.Text;
@@ -34,15 +35,29 @@ namespace BuildServerUtils
 
         #endregion
 
-        public Comms(TcpClient client)
+        public Comms()
         {
-            Client = client;
             ReadStream = new MemoryStream();
             WriteStream = new MemoryStream();
             Reader = new BinaryReader(ReadStream);
             Writer = new BinaryWriter(WriteStream);
 
             ReadBuffer = new byte[2048];
+        }
+
+        public Comms(TcpClient client) : 
+            this()
+        {
+            Client = client;
+            Client.NoDelay = true;
+
+            StartListening();
+        }
+
+        public void Connect(string ip, int port)
+        {
+            Client?.Close();
+            Client = new TcpClient(ip, port);
             Client.NoDelay = true;
 
             StartListening();
@@ -62,7 +77,7 @@ namespace BuildServerUtils
         /// <param name="str"></param>
         public void Send(string str)
         {
-            if (!string.IsNullOrWhiteSpace(str))
+            if (IsConnected && !string.IsNullOrWhiteSpace(str))
             {
                 SendByteArray(Encoding.UTF8.GetBytes(str));
             }
