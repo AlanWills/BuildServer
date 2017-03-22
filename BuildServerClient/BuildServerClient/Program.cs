@@ -24,6 +24,12 @@ namespace BuildServerClient
             ClientSettings.ReadFile();
             Client client = new Client(ClientSettings.ServerIP, ClientSettings.ServerPort);
 
+            AppDomain.CurrentDomain.ProcessExit += (object sender, EventArgs e) =>
+            {
+                // Close connection on shut down
+                if (client.IsConnected) { new QuitCommand().Execute(client, new List<string>()); }
+            };
+
             if (!client.IsConnected)
             {
                 Console.WriteLine("Use 'reconnect' to try again.");

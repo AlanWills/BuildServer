@@ -11,7 +11,7 @@ namespace BuildServer
         {
             Server server = baseServer as Server;
 
-            if (arguments.Contains("all"))
+            if (arguments.Contains(CommandStrings.All))
             {
                 // If the user passes all, we use all the branch statuses
                 arguments.Clear();
@@ -24,7 +24,7 @@ namespace BuildServer
                 if (server.Branches.ContainsKey(branchName))
                 {
                     stringBuilder.Clear();
-                    stringBuilder.Append("Branch " + branchName + " has status: " + server.Branches[branchName].TestingState.AsString());
+                    stringBuilder.Append("Branch " + branchName + " has status: " + server.Branches[branchName].TestingState.DisplayString());
                 }
 
                 baseServer.Send(stringBuilder.ToString());

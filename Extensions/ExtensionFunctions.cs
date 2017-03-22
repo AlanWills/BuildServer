@@ -9,7 +9,7 @@ namespace BuildServer
 {
     public static class ExtensionFunctions
     {
-        public static string AsString(this TestState testState)
+        public static string DisplayString(this TestState testState)
         {
             switch (testState)
             {

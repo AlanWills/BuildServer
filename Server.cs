@@ -69,6 +69,12 @@ namespace BuildServer
             base.ProcessMessage(data);
 
             string dataString = data.ConvertToString();
+            if (string.IsNullOrWhiteSpace(dataString))
+            {
+                // Ignore cruft (although it should never actually get here
+                return;
+            }
+
             Console.WriteLine("Command received: " + dataString);
 
             List<string> parameters = dataString.Split(' ').ToList();

@@ -1,6 +1,7 @@
 ﻿using BuildServerUtils;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -26,11 +27,35 @@ namespace BuildServer
 
         private bool Queued { get; set; }
 
-        public TestState TestingState { get; private set; } = TestState.kUntested;
+        public List<string> OrderedHistoryFiles
+        {
+            get
+            {
+                // Use current directory here as we will be modifying the Environment directory when building
+                return Directory.EnumerateFiles(Path.Combine(Directory.GetCurrentDirectory(), BranchName, "Build Server"), "*History.xml", SearchOption.AllDirectories).
+                                        OrderByDescending(x => new FileInfo(x).LastWriteTime).ToList();
+            }
+        }
+
+        public TestState TestingState
+        {
+            get
+            {
+                string mostRecentHistoryFile = OrderedHistoryFiles.FirstOrDefault();
+
+                if (string.IsNullOrEmpty(mostRecentHistoryFile))
+                {
+                    return TestState.kUntested;
+                }
+
+                HistoryFile file = new HistoryFile(mostRecentHistoryFile);
+                file.Load();
+
+                return file.Status;
+            }
+        }
 
         private string BranchName { get; set; }
-
-        private string LogFilePath { get; set; }
 
         public Dictionary<string, User> Notifiers { get; private set; } = new Dictionary<string, User>();
 
@@ -41,7 +66,6 @@ namespace BuildServer
         public Branch(string branchName)
         {
             BranchName = branchName;
-            LogFilePath = Path.Combine(Environment.CurrentDirectory, BranchName, "BuildLog.txt");
         }
 
         public void Build()
@@ -68,15 +92,19 @@ namespace BuildServer
             // Build and test in separate task to not block main build server from testing other projects
             Task.Run(() =>
             {
+                // This will change directory into the checked out branch
+                Checkout();
+
+                // Create directory for this build
+                DirectoryInfo thisBuildDirectory = Directory.CreateDirectory(Path.Combine(Environment.CurrentDirectory, "Build Server", DateTime.Now.ToString("yyyy-MM-dd-HH-mm", CultureInfo.InvariantCulture)));
+
                 // Redirect output into file
-                using (FileStream stream = File.Open(LogFilePath, FileMode.Create))
+                string logFilePath = Path.Combine(thisBuildDirectory.FullName, "BuildLog.txt");
+                using (FileStream stream = File.Open(logFilePath, FileMode.Create))
                 {
                     using (StreamWriter writer = new StreamWriter(stream))
                     {
                         writer.AutoFlush = true;
-
-                        // This will change directory into the checked out branch
-                        Checkout(writer);
 
                         CmdLineUtils.PerformCommand("\"" + Path.Combine("Dev Tools", "Git Hooks", "Build Server", "compile.bat") + "\"");
                         Console.WriteLine("Build of " + BranchName + " completed");
@@ -87,7 +115,7 @@ namespace BuildServer
                 }
 
                 // This will change directory out of checked out branch again
-                ReadFilesAndSendMessage();
+                ReadFilesAndSendMessage(logFilePath);
 
                 bool queued = false;
                 lock (branchLock)
@@ -127,23 +155,22 @@ namespace BuildServer
         /// </summary>
         /// <param name="projectGithubRepoName"></param>
         /// <param name="branchName"></param>
-        private void Checkout(TextWriter writer)
+        private void Checkout()
         {
             string repoDir = Path.Combine(Environment.CurrentDirectory, BranchName);
 
-            if (!Directory.Exists(repoDir))
+            if (!Directory.Exists(Path.Combine(repoDir, ".git")))
             {
-                Console.WriteLine("Cloning " + ProjectGithubRepoName + " into repoDir");
+                Console.WriteLine("Cloning " + ProjectGithubRepoName + " into " + repoDir);
                 // Clone the branch if we do not have it checked out
-                CmdLineUtils.PerformCommand(CmdLineUtils.Git, "clone -b " + BranchName + " --single-branch https://github.com/GrowSoftware/" + ProjectGithubRepoName + ".git " + BranchName, writer);
+                CmdLineUtils.PerformCommand(CmdLineUtils.Git, "clone -b " + BranchName + " --single-branch https://github.com/GrowSoftware/" + ProjectGithubRepoName + ".git " + BranchName);
             }
 
             // Change current directory and update the branch
             Environment.CurrentDirectory = repoDir;
             Console.WriteLine("Making " + BranchName + " up to date");
-            CmdLineUtils.PerformCommand(CmdLineUtils.Git, "pull", writer);
+            CmdLineUtils.PerformCommand(CmdLineUtils.Git, "pull");
 
-            writer.WriteLine("Checkout of " + BranchName + " completed");
             Console.WriteLine("Checkout of " + BranchName + " completed");
         }
 
@@ -153,7 +180,7 @@ namespace BuildServer
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void ReadFilesAndSendMessage()
+        private void ReadFilesAndSendMessage(string logFilePath)
         {
             bool passed = true;
             StringBuilder messageContents = new StringBuilder();
@@ -190,8 +217,8 @@ namespace BuildServer
                 Directory.Delete(testResults, true);
             }
 
-            // Set state of branch
-            TestingState = passed ? TestState.kPassed : TestState.kFailed;
+            // Write the history file
+            WriteHistoryFile(Directory.GetParent(logFilePath).FullName, passed);
 
             // Move back out of the checked out branch
             Console.WriteLine("Moving out of " + BranchName);
@@ -200,10 +227,21 @@ namespace BuildServer
 
             foreach (User user in Notifiers.Values)
             {
-                user.Message(LogFilePath, messageContents, BranchName, passed);
+                user.Message(logFilePath, messageContents, BranchName, passed);
             }
 
             Console.WriteLine("Testing run complete");
+        }
+
+        /// <summary>
+        /// Writes an xml file containing extra information about this particular build
+        /// </summary>
+        /// <param name="directory"></param>
+        /// <param name="passed"></param>
+        private void WriteHistoryFile(string directory, bool passed)
+        {
+            HistoryFile file = new HistoryFile(Path.Combine(directory, "History.xml"));
+            file.Save(passed);
         }
     }
 }

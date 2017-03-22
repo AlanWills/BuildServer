@@ -14,5 +14,8 @@ namespace BuildServerUtils
         public const string Help = "help";
         public const string Settings = "settings";
         public const string Reconnect = "reconnect";
+        public const string ViewBuildHistory = "history";
+        public const string CurrentBranch = "current";
+        public const string All = "all";
     }
 }
