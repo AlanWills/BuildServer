@@ -29,7 +29,7 @@ namespace BuildServerClient
                 }
             }
 
-            client.ServerComms.Send(
+            client.Send(
                 CommandStrings.GetBranchStatus + " " +
                 branchNames.ToString());
         }

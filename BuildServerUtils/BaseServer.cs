@@ -19,12 +19,12 @@ namespace BuildServerUtils
         /// <summary>
         /// Our interface to the single client we are supporting for now
         /// </summary>
-        public Comms ClientComms { get; private set; }
+        private Comms ClientComms { get; set; } = new Comms();
 
         /// <summary>
         /// Determines whether we have clients connected
         /// </summary>
-        public bool Connections { get; private set; }
+        public bool IsConnected { get { return ClientComms != null && ClientComms.IsConnected; } }
 
         #endregion
 
@@ -50,10 +50,28 @@ namespace BuildServerUtils
         /// <param name="asyncResult"></param>
         protected virtual void AcceptClient(IAsyncResult asyncResult)
         {
+            DisconnectClient();
+
             ClientComms = new Comms(Listener.EndAcceptTcpClient(asyncResult));
             ClientComms.OnDataReceived += ProcessMessage;
 
             ListenForNewClient();
+        }
+
+        public void Send(string message)
+        {
+            if (IsConnected && !string.IsNullOrEmpty(message))
+            {
+                ClientComms.Send(message);
+            }
+        }
+
+        public void DisconnectClient()
+        {
+            if (ClientComms.IsConnected)
+            {
+                ClientComms.Disconnect();
+            }
         }
         
         #region Message Callbacks

@@ -15,7 +15,7 @@ namespace BuildServerClient
 
         public void Execute(BaseClient client, List<string> parameters)
         {
-            client.ServerComms.Send(CommandStrings.Quit);
+            client.Send(CommandStrings.Quit);
             Thread.Sleep(1000);
             Program.Running = false;
         }

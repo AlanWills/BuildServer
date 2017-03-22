@@ -27,10 +27,10 @@ namespace BuildServer
             string notifySetting = arguments[2];
             Console.WriteLine("NotifySetting = " + notifySetting);
 
-            if (baseServer.ClientComms.IsConnected)
+            if (baseServer.IsConnected)
             {
                 // Notify the user
-                baseServer.ClientComms.Send("Build Command received by Build Server");
+                baseServer.Send("Build Command received by Build Server");
             }
 
             if (!server.Branches.ContainsKey(branchName))

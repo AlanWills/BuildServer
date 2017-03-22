@@ -12,7 +12,7 @@ namespace BuildServer
     {
         public void Execute(BaseServer server, List<string> arguments)
         {
-            server.ClientComms.Disconnect();
+            server.DisconnectClient();
         }
     }
 }

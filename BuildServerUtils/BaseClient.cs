@@ -17,7 +17,7 @@ namespace BuildServerUtils
         /// <summary>
         /// The interface to the server
         /// </summary>
-        public Comms ServerComms { get; private set; } = new Comms();
+        private Comms ServerComms { get; set; } = new Comms();
 
         /// <summary>
         /// Wrapper property for checking that the ServerComms is connected.
@@ -60,6 +60,14 @@ namespace BuildServerUtils
             {
                 errorMessage = e.Message;
                 return false;
+            }
+        }
+
+        public void Send(string message)
+        {
+            if (IsConnected && !string.IsNullOrEmpty(message))
+            {
+                ServerComms.Send(message);
             }
         }
 

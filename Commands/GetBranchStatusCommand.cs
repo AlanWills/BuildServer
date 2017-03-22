@@ -27,7 +27,7 @@ namespace BuildServer
                     stringBuilder.Append("Branch " + branchName + " has status: " + server.Branches[branchName].TestingState.AsString());
                 }
 
-                baseServer.ClientComms.Send(stringBuilder.ToString());
+                baseServer.Send(stringBuilder.ToString());
             }
         }
     }

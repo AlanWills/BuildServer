@@ -21,7 +21,7 @@ namespace BuildServerClient
             string email = parameters.Count > 1 ? parameters[1] : ClientSettings.Email;
             string notifySetting = parameters.Count > 2 ? parameters[2] : ClientSettings.NotifySetting;
 
-            client.ServerComms.Send(
+            client.Send(
                 CommandStrings.BuildBranch + " " +
                 branchName + " " +
                 email + " " +
