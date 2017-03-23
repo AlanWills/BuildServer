@@ -194,8 +194,6 @@ namespace BuildServer
             }
             else
             {
-                messageContents.AppendLine("The following tests failed:\n");
-
                 foreach (string testFile in Directory.EnumerateFiles(testResults, "*.trx"))
                 {
                     XmlDocument document = new XmlDocument();
@@ -208,6 +206,12 @@ namespace BuildServer
 
                         if (result != "Passed")
                         {
+                            if (passed)
+                            {
+                                // If this is the first to fail, we write this line before changing the flag
+                                messageContents.AppendLine("The following tests failed:\n");
+                            }
+
                             passed = false;
                             messageContents.AppendLine(name);
                         }

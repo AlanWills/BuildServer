@@ -39,7 +39,7 @@ namespace BuildServerClient.Commands
                 string error = "";
                 if (client.TryConnect(ip, port, ref error))
                 {
-                    Console.WriteLine("Connected successful");
+                    Console.WriteLine("Connection successful");
                 }
                 else
                 {
