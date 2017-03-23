@@ -16,6 +16,8 @@ namespace BuildServer
 
         public TestState Status { get; private set; } = TestState.kUntested;
 
+        public List<string> FailedTests { get; private set; } = new List<string>();
+
         #endregion
 
         public HistoryFile(string filePath)
@@ -41,9 +43,14 @@ namespace BuildServer
                     Status = TestState.kFailed;
                 }
             }
+
+            foreach (XmlElement element in document.GetElementsByTagName("TestName"))
+            {
+                FailedTests.Add(element.InnerText);
+            }
         }
 
-        public void Save(bool passed)
+        public void Save(bool passed, List<string> failedTestNames)
         {
             XmlDocument document = new XmlDocument();
             XmlElement root = document.CreateElement("Root");
@@ -54,6 +61,19 @@ namespace BuildServer
                 XmlElement status = document.CreateElement("TestingState");
                 status.InnerText = passed.ToString();
                 root.AppendChild(status);
+            }
+
+            // Write failed tests
+            {
+                XmlElement failedTests = document.CreateElement("FailedTests");
+                root.AppendChild(failedTests);
+
+                foreach (string failedTestName in failedTestNames)
+                {
+                    XmlElement testNameElement = document.CreateElement("TestName");
+                    testNameElement.InnerText = failedTestName;
+                    failedTests.AppendChild(testNameElement);
+                }
             }
 
             document.Save(FilePath);

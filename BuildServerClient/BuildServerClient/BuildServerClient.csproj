@@ -55,6 +55,7 @@
     <Compile Include="Commands\BuildBranchCommand.cs" />
     <Compile Include="Commands\EditSettingsCommand.cs" />
     <Compile Include="Commands\GetBranchStatusCommand.cs" />
+    <Compile Include="Commands\GetFailedTestsCommand.cs" />
     <Compile Include="Commands\HelpCommand.cs" />
     <Compile Include="Commands\QuitCommand.cs" />
     <Compile Include="Commands\ReconnectCommand.cs" />

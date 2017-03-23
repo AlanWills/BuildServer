@@ -185,6 +185,7 @@ namespace BuildServer
             bool passed = true;
             StringBuilder messageContents = new StringBuilder();
             string testResults = Path.Combine(Environment.CurrentDirectory, "TestResults");
+            List<string> failedTestNames = new List<string>();
 
             if (!Directory.Exists(testResults))
             {
@@ -214,6 +215,7 @@ namespace BuildServer
 
                             passed = false;
                             messageContents.AppendLine(name);
+                            failedTestNames.Add(name);
                         }
                     }
                 }
@@ -222,7 +224,7 @@ namespace BuildServer
             }
 
             // Write the history file
-            WriteHistoryFile(Directory.GetParent(logFilePath).FullName, passed);
+            WriteHistoryFile(Directory.GetParent(logFilePath).FullName, passed, failedTestNames);
 
             // Move back out of the checked out branch
             Console.WriteLine("Moving out of " + BranchName);
@@ -242,10 +244,10 @@ namespace BuildServer
         /// </summary>
         /// <param name="directory"></param>
         /// <param name="passed"></param>
-        private void WriteHistoryFile(string directory, bool passed)
+        private void WriteHistoryFile(string directory, bool passed, List<string> failedTestNames)
         {
             HistoryFile file = new HistoryFile(Path.Combine(directory, "History.xml"));
-            file.Save(passed);
+            file.Save(passed, failedTestNames);
         }
     }
 }

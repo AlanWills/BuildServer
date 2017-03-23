@@ -57,6 +57,7 @@
     <Compile Include="Commands\BuildBranchCommand.cs" />
     <Compile Include="Commands\DisconnectClientCommand.cs" />
     <Compile Include="Commands\GetBranchStatusCommand.cs" />
+    <Compile Include="Commands\GetFailedTestsCommand.cs" />
     <Compile Include="Commands\ViewBuildHistoryCommand.cs" />
     <Compile Include="Extensions\ExtensionFunctions.cs" />
     <Compile Include="HistoryFile.cs" />
