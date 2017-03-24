@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Xml;
 
@@ -16,9 +17,11 @@ namespace BuildServer
             BuildServerSettings.ReadFile(Path.Combine(Directory.GetCurrentDirectory(), "Settings.xml"));
 
             Server server = new Server(BuildServerSettings.ServerPort);
-            Console.WriteLine("Ready");
 
-            while (true) { }
+            Console.WriteLine("Ready");
+            Console.ReadKey(true);
+
+            server.Disconnect();
         }
 
         private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)

@@ -21,9 +21,14 @@ namespace BuildServerUtils
         /// <param name="commandAndArgs"></param>
         /// <param name="onCommandCompleteCallback"></param>
         /// <returns></returns>
-        public static void PerformCommand(string fileName, string args = "", TextWriter outputWriter = null, EventHandler onCommandCompleteCallback = null)
+        public static void PerformCommand(
+            string fileName, 
+            string workingDirectory,
+            string args = "", 
+            TextWriter outputWriter = null, 
+            EventHandler onCommandCompleteCallback = null)
         {
-            ProcessStartInfo cmdInfo = CreateCmdLineProcessStartInfo(args, outputWriter != null);
+            ProcessStartInfo cmdInfo = CreateCmdLineProcessStartInfo(workingDirectory, args, outputWriter != null);
             cmdInfo.FileName = fileName;
             RunProcess(cmdInfo, onCommandCompleteCallback, outputWriter);
         }
@@ -34,12 +39,12 @@ namespace BuildServerUtils
         /// </summary>
         /// <param name="arguments"></param>
         /// <returns></returns>
-        public static ProcessStartInfo CreateCmdLineProcessStartInfo(string arguments = "", bool redirectOutput = false)
+        public static ProcessStartInfo CreateCmdLineProcessStartInfo(string workingDirectory, string arguments = "", bool redirectOutput = false)
         {
             ProcessStartInfo cmdInfo = new ProcessStartInfo();
             cmdInfo.UseShellExecute = false;
             cmdInfo.Arguments = arguments;
-            cmdInfo.WorkingDirectory = Directory.GetCurrentDirectory();
+            cmdInfo.WorkingDirectory = workingDirectory;
 
             if (redirectOutput)
             {

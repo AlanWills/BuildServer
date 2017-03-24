@@ -30,7 +30,7 @@ namespace BuildServer
             if (baseServer.IsConnected)
             {
                 // Notify the user
-                baseServer.Send("Build Command received by Build Server");
+                baseServer.Send("build Command received by Build Server");
             }
 
             if (!server.Branches.ContainsKey(branchName))

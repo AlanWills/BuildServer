@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.InteropServices;
 
 namespace BuildServerUtils
 {
@@ -32,8 +33,13 @@ namespace BuildServerUtils
         {
             Listener = new TcpListener(IPAddress.Any, port);
             Listener.Start();
-
             ListenForNewClient();
+        }
+        
+        public void Disconnect()
+        {
+            DisconnectClient();
+            Listener.Stop();
         }
 
         /// <summary>
@@ -55,6 +61,8 @@ namespace BuildServerUtils
             ClientComms = new Comms(Listener.EndAcceptTcpClient(asyncResult));
             ClientComms.OnDataReceived += ProcessMessage;
 
+            Console.WriteLine("Client connected");
+
             ListenForNewClient();
         }
 
@@ -68,10 +76,7 @@ namespace BuildServerUtils
 
         public void DisconnectClient()
         {
-            if (ClientComms.IsConnected)
-            {
-                ClientComms.Disconnect();
-            }
+            ClientComms?.Disconnect();
         }
         
         #region Message Callbacks

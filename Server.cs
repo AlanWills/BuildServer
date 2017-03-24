@@ -40,7 +40,7 @@ namespace BuildServer
 
             LoadBranches();
         }
-
+        
         private void NightlyBuild_DoWork(object state)
         {
             foreach (Branch branch in Branches.Values)

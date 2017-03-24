@@ -55,7 +55,7 @@ namespace BuildServer
             }
         }
 
-        private string BranchName { get; set; }
+        private readonly string BranchName;
 
         public Dictionary<string, User> Notifiers { get; private set; } = new Dictionary<string, User>();
 
@@ -92,30 +92,39 @@ namespace BuildServer
             // Build and test in separate task to not block main build server from testing other projects
             Task.Run(() =>
             {
-                // This will change directory into the checked out branch
-                Checkout();
-
                 // Create directory for this build
-                DirectoryInfo thisBuildDirectory = Directory.CreateDirectory(Path.Combine(Environment.CurrentDirectory, "Build Server", DateTime.Now.ToString("yyyy-MM-dd-HH-mm", CultureInfo.InvariantCulture)));
+                DirectoryInfo thisBuildDirectory = Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), BranchName, "Build Server", DateTime.Now.ToString("yyyy-MM-dd-HH-mm", CultureInfo.InvariantCulture)));
 
-                // Redirect output into file
-                string logFilePath = Path.Combine(thisBuildDirectory.FullName, "BuildLog.txt");
-                using (FileStream stream = File.Open(logFilePath, FileMode.Create))
+                // Redirect building output into file
+                string buildLogFilePath = Path.Combine(thisBuildDirectory.FullName, "BuildLog.txt");
+                using (FileStream stream = File.Open(buildLogFilePath, FileMode.Create))
                 {
                     using (StreamWriter writer = new StreamWriter(stream))
                     {
                         writer.AutoFlush = true;
 
-                        CmdLineUtils.PerformCommand("\"" + Path.Combine("Dev Tools", "Git Hooks", "Build Server", "compile.bat") + "\"");
-                        Console.WriteLine("Build of " + BranchName + " completed");
+                        Checkout(writer);
 
-                        CmdLineUtils.PerformCommand("\"" + Path.Combine("Dev Tools", "Git Hooks", "Build Server", "run_tests.bat") + "\"", outputWriter: writer);
+                        CmdLineUtils.PerformCommand("cmd", Path.Combine(Directory.GetCurrentDirectory(), BranchName), "\"" + Path.Combine("Dev Tools", "Git Hooks", "Build Server", "compile.bat") + "\"", outputWriter: writer);
+                        Console.WriteLine("Build of " + BranchName + " completed");
+                    }
+                }
+
+                // Redirect testing output into file
+                string testLogFilePath = Path.Combine(thisBuildDirectory.FullName, "TestLog.txt");
+                using (FileStream stream = File.Open(testLogFilePath, FileMode.Create))
+                {
+                    using (StreamWriter writer = new StreamWriter(stream))
+                    {
+                        writer.AutoFlush = true;
+
+                        // Working directory for testing must absolutely be inside the repo because the test results files are created in the working directory
+                        CmdLineUtils.PerformCommand("cmd", Path.Combine(Directory.GetCurrentDirectory(), BranchName), "\"" + Path.Combine("Dev Tools", "Git Hooks", "Build Server", "run_tests.bat") + "\"", outputWriter: writer);
                         Console.WriteLine("Testing of " + BranchName + " completed");
                     }
                 }
 
-                // This will change directory out of checked out branch again
-                ReadFilesAndSendMessage(logFilePath);
+                ReadFilesAndSendMessage(testLogFilePath);
 
                 bool queued = false;
                 lock (branchLock)
@@ -155,21 +164,19 @@ namespace BuildServer
         /// </summary>
         /// <param name="projectGithubRepoName"></param>
         /// <param name="branchName"></param>
-        private void Checkout()
+        private void Checkout(StreamWriter writer)
         {
-            string repoDir = Path.Combine(Environment.CurrentDirectory, BranchName);
+            string repoDir = Path.Combine(Directory.GetCurrentDirectory(), BranchName);
 
             if (!Directory.Exists(Path.Combine(repoDir, ".git")))
             {
-                Console.WriteLine("Cloning " + ProjectGithubRepoName + " into " + repoDir);
+                writer.WriteLine("Cloning " + ProjectGithubRepoName + " into " + repoDir);
                 // Clone the branch if we do not have it checked out
-                CmdLineUtils.PerformCommand(CmdLineUtils.Git, "clone -b " + BranchName + " --single-branch https://github.com/GrowSoftware/" + ProjectGithubRepoName + ".git " + BranchName);
+                CmdLineUtils.PerformCommand(CmdLineUtils.Git, Directory.GetCurrentDirectory(), "clone -b " + BranchName + " --single-branch https://github.com/GrowSoftware/" + ProjectGithubRepoName + ".git " + BranchName, outputWriter: writer);
             }
 
-            // Change current directory and update the branch
-            Environment.CurrentDirectory = repoDir;
-            Console.WriteLine("Making " + BranchName + " up to date");
-            CmdLineUtils.PerformCommand(CmdLineUtils.Git, "pull");
+            writer.WriteLine("Making " + BranchName + " up to date");
+            CmdLineUtils.PerformCommand(CmdLineUtils.Git, repoDir, "pull", outputWriter: writer);
 
             Console.WriteLine("Checkout of " + BranchName + " completed");
         }
@@ -184,7 +191,7 @@ namespace BuildServer
         {
             bool passed = true;
             StringBuilder messageContents = new StringBuilder();
-            string testResults = Path.Combine(Environment.CurrentDirectory, "TestResults");
+            string testResults = Path.Combine(Directory.GetCurrentDirectory(), BranchName, "TestResults");
             List<string> failedTestNames = new List<string>();
 
             if (!Directory.Exists(testResults))
@@ -225,11 +232,6 @@ namespace BuildServer
 
             // Write the history file
             WriteHistoryFile(Directory.GetParent(logFilePath).FullName, passed, failedTestNames);
-
-            // Move back out of the checked out branch
-            Console.WriteLine("Moving out of " + BranchName);
-            Environment.CurrentDirectory = Directory.GetParent(Environment.CurrentDirectory).FullName;
-            Console.WriteLine("Current directory now " + Environment.CurrentDirectory);
 
             foreach (User user in Notifiers.Values)
             {

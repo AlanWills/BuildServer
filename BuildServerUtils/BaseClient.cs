@@ -39,7 +39,12 @@ namespace BuildServerUtils
                 Console.WriteLine("Connection failed");
             }
         }
-        
+
+        public virtual void Disconnect()
+        {
+            ServerComms?.Disconnect();
+        }
+
         /// <summary>
         /// Attempts to connect to the inputted ip through the inputted port.
         /// </summary>
