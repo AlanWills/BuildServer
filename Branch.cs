@@ -92,6 +92,8 @@ namespace BuildServer
             // Build and test in separate task to not block main build server from testing other projects
             Task.Run(() =>
             {
+                Checkout();
+
                 string repoDir = Path.Combine(Directory.GetCurrentDirectory(), BranchName);
 
                 // Create directory for this build
@@ -103,8 +105,6 @@ namespace BuildServer
                 {
                     using (StreamWriter writer = new StreamWriter(stream))
                     {
-                        Checkout(writer);
-
                         Console.WriteLine("Starting build of " + BranchName);
                         CmdLineUtils.PerformCommand(Path.Combine(repoDir, "Dev Tools", "Git Hooks", "Build Server", "compile.bat"), repoDir, outputWriter: writer);
                         Console.WriteLine("Build of " + BranchName + " completed");
@@ -117,9 +117,11 @@ namespace BuildServer
                 {
                     using (StreamWriter writer = new StreamWriter(stream))
                     {
+                        Console.WriteLine("Starting test run of " + BranchName);
+
                         // Working directory for testing must absolutely be inside the repo because the test results files are created in the working directory
                         CmdLineUtils.PerformCommand(Path.Combine(repoDir, "Dev Tools", "Git Hooks", "Build Server", "run_tests.bat"), repoDir, outputWriter: writer);
-                        Console.WriteLine("Testing of " + BranchName + " completed");
+                        Console.WriteLine("Test run of " + BranchName + " completed");
                     }
                 }
 
@@ -163,19 +165,19 @@ namespace BuildServer
         /// </summary>
         /// <param name="projectGithubRepoName"></param>
         /// <param name="branchName"></param>
-        private void Checkout(StreamWriter writer)
+        private void Checkout()
         {
             string repoDir = Path.Combine(Directory.GetCurrentDirectory(), BranchName);
 
-            if (!Directory.Exists(Path.Combine(repoDir, ".git")))
+            if (!Directory.Exists(repoDir))
             {
-                writer.WriteLine("Cloning " + ProjectGithubRepoName + " into " + repoDir);
+                Console.WriteLine("Cloning " + ProjectGithubRepoName + " into " + repoDir);
                 // Clone the branch if we do not have it checked out
-                CmdLineUtils.PerformCommand(CmdLineUtils.Git, Directory.GetCurrentDirectory(), "clone -b " + BranchName + " --single-branch https://github.com/GrowSoftware/" + ProjectGithubRepoName + ".git " + BranchName, outputWriter: writer);
+                CmdLineUtils.PerformCommand(CmdLineUtils.Git, Directory.GetCurrentDirectory(), "clone -b " + BranchName + " --single-branch https://github.com/GrowSoftware/" + ProjectGithubRepoName + ".git " + BranchName);
             }
 
-            writer.WriteLine("Making " + BranchName + " up to date");
-            CmdLineUtils.PerformCommand(CmdLineUtils.Git, repoDir, "pull", outputWriter: writer);
+            Console.WriteLine("Making " + BranchName + " up to date");
+            CmdLineUtils.PerformCommand(CmdLineUtils.Git, repoDir, "pull");
 
             Console.WriteLine("Checkout of " + BranchName + " completed");
         }
