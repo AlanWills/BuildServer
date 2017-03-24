@@ -14,24 +14,11 @@ namespace BuildServerClient
 
         public void Execute(BaseClient client, List<string> parameters)
         {
-            StringBuilder branchNames = new StringBuilder(1024);
-            if (parameters.Count == 0)
-            {
-                // Use current branch name
-                branchNames.Append(ClientSettings.CurrentBranch);
-            }
-            else
-            {
-                foreach (string branchName in parameters)
-                {
-                    branchNames.Append(branchName);
-                    branchNames.Append(" ");
-                }
-            }
+            string branchName = parameters.Count == 0 ? ClientSettings.CurrentBranch : parameters[0];
 
-            client.Send(
-                CommandStrings.GetBranchStatus + " " +
-                branchNames.ToString());
+            client.Get(
+                CommandStrings.GetBranchStatus,
+                new KeyValuePair<string, string>(CommandStrings.Branch, branchName));
         }
     }
 }

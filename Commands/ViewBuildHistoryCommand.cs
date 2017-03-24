@@ -15,7 +15,12 @@ namespace BuildServer
         {
             Server server = baseServer as Server;
 
-            string[] branches = arguments.GetValues("branch");
+            string[] branches = arguments.GetValues(CommandStrings.Branch);
+            if (branches == null)
+            {
+                return "Specify a branch using branch=[branch_name]";
+            }
+
             string branchName = branches.Length > 0 ? branches[0] : "";
 
             if (!server.Branches.ContainsKey(branchName))
@@ -24,8 +29,9 @@ namespace BuildServer
             }
 
             StringBuilder historyInfo = new StringBuilder();
+
             string[] quantities = arguments.GetValues("quantity");
-            string quantityString = quantities.Length > 0 ? quantities[0] : "10";
+            string quantityString = quantities?.Length > 0 ? quantities[0] : "10";
             int quantity = 0;
 
             List<string> historyFiles = server.Branches[branchName].OrderedHistoryFiles;

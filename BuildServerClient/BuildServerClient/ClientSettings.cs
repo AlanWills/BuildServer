@@ -66,11 +66,11 @@ namespace BuildServerClient
                 if (serverIP.Count != 1 || string.IsNullOrEmpty(serverIP[0].InnerText))
                 {
                     Console.WriteLine("No Server IP in Settings File.");
-                    Thread.Sleep(2000);
-                    return;
                 }
-
-                ServerIP = serverIP[0].InnerText;
+                else
+                {
+                    ServerIP = serverIP[0].InnerText;
+                }
             }
 
             // Server port
@@ -79,19 +79,20 @@ namespace BuildServerClient
                 if (serverPort.Count != 1 || string.IsNullOrEmpty(serverPort[0].InnerText))
                 {
                     Console.WriteLine("No Server Port in Settings File.");
-                    Thread.Sleep(2000);
-                    return;
                 }
-
-                int port = -1;
-                if (!int.TryParse(serverPort[0].InnerText, out port))
+                else
                 {
-                    Console.WriteLine("Server Port is not a number.");
-                    Thread.Sleep(2000);
-                    return;
-                }
 
-                ServerPort = port;
+                    int port = -1;
+                    if (!int.TryParse(serverPort[0].InnerText, out port))
+                    {
+                        Console.WriteLine("Server Port is not a number.");
+                    }
+                    else
+                    {
+                        ServerPort = port;
+                    }
+                }
             }
 
             // Email
@@ -100,11 +101,11 @@ namespace BuildServerClient
                 if (emails.Count != 1 && string.IsNullOrEmpty(emails[0].InnerText))
                 {
                     Console.WriteLine("No Email in Settings file.");
-                    Thread.Sleep(2000);
-                    return;
                 }
-
-                Email = emails[0].InnerText;
+                else
+                {
+                    Email = emails[0].InnerText;
+                }
             }
 
             // Notify setting
@@ -113,11 +114,11 @@ namespace BuildServerClient
                 if (notifySettings.Count != 1 && string.IsNullOrEmpty(notifySettings[0].InnerText))
                 {
                     Console.WriteLine("No OnlyEmailOnFail in Settings file.");
-                    Thread.Sleep(2000);
-                    return;
                 }
-
-                NotifySetting = notifySettings[0].InnerText;
+                else
+                {
+                    NotifySetting = notifySettings[0].InnerText;
+                }
             }
         }
 

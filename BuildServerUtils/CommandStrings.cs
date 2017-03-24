@@ -17,6 +17,7 @@ namespace BuildServerUtils
         public const string ViewBuildHistory = "/history";
         public const string CurrentBranch = "current";
         public const string All = "all";
+        public const string Branch = "branch";
         public const string GetFailedTests = "/failedtests";
     }
 }

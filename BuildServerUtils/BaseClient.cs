@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,28 +9,59 @@ using System.Threading.Tasks;
 namespace BuildServerUtils
 {
     /// <summary>
-    /// A base client class which connects and communicates with a remote server
+    /// A base client class which connects and communicates with an http server
     /// </summary>
-    public abstract class BaseClient
+    public class BaseClient
     {
+        #region Properties and Fields
+
+        private Comms Comms { get; set; } = new Comms();
+
+        public event ResponseHandler ResponseReceived;
+
+        #endregion
+
         public BaseClient(string ipAddress, int portNumber = 1490)
         {
+            Comms.Connect(ipAddress, portNumber);
+
+            Comms.ResponseReceived += Comms_ResponseReceived;
         }
-        
-        public void Send(string message)
+
+        private void Comms_ResponseReceived()
         {
-            
+            ResponseReceived?.Invoke();
         }
 
-        #region Callbacks
+        public void Get(string uri, params KeyValuePair<string, string>[] parameters)
+        {
+            Send(HttpMethod.Get, uri, parameters);
+        }
 
-        /// <summary>
-        /// A function which is called when this client receives a message.
-        /// Override to perform behaviour when custom messages arrive.
-        /// </summary>
-        /// <param name="data"></param>
-        protected virtual void OnMessageReceived(byte[] data) { }
-        
-        #endregion
+        public void Post(string uri, params KeyValuePair<string, string>[] parameters)
+        {
+            Send(HttpMethod.Post, uri, parameters);
+        }
+
+        private void Send(HttpMethod method, string uri, params KeyValuePair<string, string>[] parameters)
+        {
+            StringBuilder fullRequest = new StringBuilder(uri);
+
+            for (int i = 0; i < parameters.Length; ++i)
+            {
+                if (i == 0)
+                {
+                    fullRequest.Append("?");
+                }
+                else
+                {
+                    fullRequest.Append("&");
+                }
+
+                fullRequest.Append(parameters[i].Key + "=" + parameters[i].Value);
+            }
+
+            Comms.Send(method, fullRequest.ToString());
+        }
     }
 }

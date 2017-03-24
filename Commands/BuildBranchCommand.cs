@@ -18,9 +18,9 @@ namespace BuildServer
                 return "Not enough parameters to build command";
             }
 
-            string branchName = arguments.GetValues("branch")?[0];
+            string branchName = arguments.GetValues(CommandStrings.Branch)?[0];
             string email = arguments.GetValues("email")?[0];
-            string notifySetting = arguments.GetValues("email_on_fail_only")?[0];
+            string notifySetting = arguments.GetValues("only_email_on_fail")?[0];
 
             if (!server.Branches.ContainsKey(branchName))
             {

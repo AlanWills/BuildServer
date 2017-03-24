@@ -13,7 +13,7 @@ namespace BuildServer.Commands
     {
         public string Execute(BaseServer baseServer, NameValueCollection arguments)
         {
-            string[] branches = arguments.GetValues("branch");
+            string[] branches = arguments.GetValues(CommandStrings.Branch);
 
             if (branches.Length < 1)
             {

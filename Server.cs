@@ -71,7 +71,7 @@ namespace BuildServer
         {
             base.ProcessMessage(requestContext);
 
-            StringBuilder builder = new StringBuilder("<html><body>");
+            StringBuilder builder = new StringBuilder("<html><body>").AppendLine();
 
             string url = requestContext.Request.RawUrl;
             if (string.IsNullOrWhiteSpace(url))
@@ -94,7 +94,7 @@ namespace BuildServer
                 }
             }
 
-            builder.Append("</body></html>");
+            builder.AppendLine("</body></html>");
 
             byte[] bytes = Encoding.UTF8.GetBytes(builder.ToString());
 

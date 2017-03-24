@@ -19,7 +19,9 @@ namespace BuildServerClient.Commands
         {
             string branchName = (parameters.Count == 0 || parameters[0] == CommandStrings.CurrentBranch) ? ClientSettings.CurrentBranch : parameters[0];
 
-            client.Send(CommandStrings.GetFailedTests + " " + branchName);
+            client.Get(
+                CommandStrings.GetFailedTests, 
+                new KeyValuePair<string, string>(CommandStrings.Branch, branchName));
         }
     }
 }

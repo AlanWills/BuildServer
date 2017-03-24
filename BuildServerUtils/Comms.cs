@@ -3,6 +3,8 @@ using System.Net.Http;
 
 namespace BuildServerUtils
 {
+    public delegate void ResponseHandler();
+
     /// <summary>
     /// An interface to a client.
     /// Hides the nuts and bolts and provides a public interface of just data input and output from a data sender/receiver.
@@ -12,6 +14,8 @@ namespace BuildServerUtils
         #region Properties and Fields
 
         private HttpClient Client { get; set; }
+
+        public event ResponseHandler ResponseReceived;
 
         #endregion
 
@@ -35,11 +39,16 @@ namespace BuildServerUtils
         /// </summary>
         /// <param name="client"></param>
         /// <param name="str"></param>
-        public void Send(string str)
+        public async void Send(HttpMethod method, string uri)
         {
-            if (!string.IsNullOrWhiteSpace(str))
+            if (!string.IsNullOrWhiteSpace(uri))
             {
-                Client.SendAsync(new HttpRequestMessage(HttpMethod.Post, str));
+                HttpResponseMessage message = await Client.SendAsync(new HttpRequestMessage(method, uri));
+                string result = await message.Content.ReadAsStringAsync();
+
+                ResponseReceived?.Invoke();
+
+                Console.WriteLine(result);
             }
         }
 

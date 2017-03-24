@@ -13,7 +13,7 @@ namespace BuildServer
         {
             Server server = baseServer as Server;
 
-            List<string> branches = arguments.GetValues("branch")?.ToList();
+            List<string> branches = arguments.GetValues(CommandStrings.Branch)?.ToList();
 
             if (branches.Contains(CommandStrings.All))
             {

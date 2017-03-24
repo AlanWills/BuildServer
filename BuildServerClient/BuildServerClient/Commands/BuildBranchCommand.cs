@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ValuePair = System.Collections.Generic.KeyValuePair<string, string>;
 
 namespace BuildServerClient
 {
@@ -21,11 +22,11 @@ namespace BuildServerClient
             string email = parameters.Count > 1 ? parameters[1] : ClientSettings.Email;
             string notifySetting = parameters.Count > 2 ? parameters[2] : ClientSettings.NotifySetting;
 
-            client.Send(
-                CommandStrings.BuildBranch + " " +
-                branchName + " " +
-                email + " " +
-                notifySetting);
+            client.Post(
+                CommandStrings.BuildBranch,
+                new ValuePair(CommandStrings.Branch, branchName),
+                new ValuePair("email", email),
+                new ValuePair("only_email_on_fail", notifySetting));
         }
     }
 }
