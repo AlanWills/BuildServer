@@ -16,12 +16,11 @@ namespace BuildServer
 
             BuildServerSettings.ReadFile(Path.Combine(Directory.GetCurrentDirectory(), "Settings.xml"));
 
-            Server server = new Server(BuildServerSettings.ServerPort);
-
-            Console.WriteLine("Ready");
-            Console.ReadKey(true);
-
-            server.Disconnect();
+            using (Server server = new Server(BuildServerSettings.ServerPort))
+            {
+                Console.WriteLine("Ready");
+                Console.ReadKey(true);
+            }
         }
 
         private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)

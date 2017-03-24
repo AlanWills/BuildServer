@@ -92,8 +92,10 @@ namespace BuildServer
             // Build and test in separate task to not block main build server from testing other projects
             Task.Run(() =>
             {
+                string repoDir = Path.Combine(Directory.GetCurrentDirectory(), BranchName);
+
                 // Create directory for this build
-                DirectoryInfo thisBuildDirectory = Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), BranchName, "Build Server", DateTime.Now.ToString("yyyy-MM-dd-HH-mm", CultureInfo.InvariantCulture)));
+                DirectoryInfo thisBuildDirectory = Directory.CreateDirectory(Path.Combine(repoDir, "Build Server", DateTime.Now.ToString("yyyy-MM-dd-HH-mm", CultureInfo.InvariantCulture)));
 
                 // Redirect building output into file
                 string buildLogFilePath = Path.Combine(thisBuildDirectory.FullName, "BuildLog.txt");
@@ -101,11 +103,10 @@ namespace BuildServer
                 {
                     using (StreamWriter writer = new StreamWriter(stream))
                     {
-                        writer.AutoFlush = true;
-
                         Checkout(writer);
 
-                        CmdLineUtils.PerformCommand("cmd", Path.Combine(Directory.GetCurrentDirectory(), BranchName), "\"" + Path.Combine("Dev Tools", "Git Hooks", "Build Server", "compile.bat") + "\"", outputWriter: writer);
+                        Console.WriteLine("Starting build of " + BranchName);
+                        CmdLineUtils.PerformCommand(Path.Combine(repoDir, "Dev Tools", "Git Hooks", "Build Server", "compile.bat"), repoDir, outputWriter: writer);
                         Console.WriteLine("Build of " + BranchName + " completed");
                     }
                 }
@@ -116,10 +117,8 @@ namespace BuildServer
                 {
                     using (StreamWriter writer = new StreamWriter(stream))
                     {
-                        writer.AutoFlush = true;
-
                         // Working directory for testing must absolutely be inside the repo because the test results files are created in the working directory
-                        CmdLineUtils.PerformCommand("cmd", Path.Combine(Directory.GetCurrentDirectory(), BranchName), "\"" + Path.Combine("Dev Tools", "Git Hooks", "Build Server", "run_tests.bat") + "\"", outputWriter: writer);
+                        CmdLineUtils.PerformCommand(Path.Combine(repoDir, "Dev Tools", "Git Hooks", "Build Server", "run_tests.bat"), repoDir, outputWriter: writer);
                         Console.WriteLine("Testing of " + BranchName + " completed");
                     }
                 }

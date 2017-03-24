@@ -8,7 +8,7 @@ namespace BuildServerUtils
     /// <summary>
     /// A base server which handles listening for client connections and has simple API to communicate back and forth
     /// </summary>
-    public abstract class BaseServer
+    public abstract class BaseServer : IDisposable
     {
         #region Properties and Fields
 
@@ -36,7 +36,7 @@ namespace BuildServerUtils
             ListenForNewClient();
         }
         
-        public void Disconnect()
+        public void Dispose()
         {
             DisconnectClient();
             Listener.Stop();
@@ -58,12 +58,16 @@ namespace BuildServerUtils
         {
             DisconnectClient();
 
-            ClientComms = new Comms(Listener.EndAcceptTcpClient(asyncResult));
-            ClientComms.OnDataReceived += ProcessMessage;
+            try
+            {
+                ClientComms = new Comms(Listener.EndAcceptTcpClient(asyncResult));
+                ClientComms.OnDataReceived += ProcessMessage;
 
-            Console.WriteLine("Client connected");
+                Console.WriteLine("Client connected");
 
-            ListenForNewClient();
+                ListenForNewClient();
+            }
+            catch { }
         }
 
         public void Send(string message)

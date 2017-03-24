@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Root>
   <ServerIP>127.0.0.1</ServerIP>
-  <ServerPort>1490</ServerPort>
+  <ServerPort>1495</ServerPort>
   <Email>alan@grow.am</Email>
   <!--Put N here for all build updates-->
   <OnlyEmailOnFail>N</OnlyEmailOnFail>

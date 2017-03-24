@@ -43,10 +43,14 @@ namespace BuildServer.Commands
                 return;
             }
 
+            StringBuilder str = new StringBuilder();
+
             foreach (string testName in file.FailedTests)
             {
-                baseServer.Send(testName);
+                str.AppendLine(testName);
             }
+
+            baseServer.Send(str.ToString());
         }
     }
 }
