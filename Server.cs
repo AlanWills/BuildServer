@@ -4,7 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Reflection;
+using System.Text;
 using System.Threading;
 
 namespace BuildServer
@@ -27,11 +29,12 @@ namespace BuildServer
 
         #endregion
 
-        public Server(int port = 1490) : 
-            base(port)
+        public Server(string ip, int port) : 
+            base(ip, port)
         {
             foreach (Type type in Assembly.GetExecutingAssembly().GetTypes().Where(x => x.GetCustomAttribute<CommandAttribute>() != null))
             {
+                Listener.Prefixes.Add(BaseAddress + type.GetCustomAttribute<CommandAttribute>().Token + "/");
                 CommandRegistry.Add(type.GetCustomAttribute<CommandAttribute>().Token, Activator.CreateInstance(type) as IServerCommand);
             }
 
@@ -64,34 +67,42 @@ namespace BuildServer
             }
         }
         
-        protected override void ProcessMessage(byte[] data)
+        protected override void ProcessMessage(HttpListenerContext requestContext)
         {
-            base.ProcessMessage(data);
+            base.ProcessMessage(requestContext);
 
-            string dataString = data.ConvertToString();
-            if (string.IsNullOrWhiteSpace(dataString))
+            StringBuilder builder = new StringBuilder("<html><body>");
+
+            string url = requestContext.Request.RawUrl;
+            if (string.IsNullOrWhiteSpace(url))
             {
                 // Ignore cruft (although it should never actually get here
                 return;
             }
 
-            Console.WriteLine("Command received: " + dataString);
-
-            List<string> parameters = dataString.Split(' ').ToList();
-            parameters.RemoveAll(x => string.IsNullOrWhiteSpace(x));
+            Console.WriteLine("Command received: " + url);
 
             foreach (KeyValuePair<string, IServerCommand> command in CommandRegistry)
             {
-                if (parameters[0] == command.Key)
+                // Match url to a command
+                if (url.StartsWith(command.Key))
                 {
-                    parameters.RemoveAt(0);
-
-                    // Remove command string
-                    command.Value.Execute(this, parameters);
+                    string commandResponse = command.Value.Execute(this, requestContext.Request.QueryString);
+                    builder.Append(commandResponse);
 
                     break;
                 }
             }
+
+            builder.Append("</body></html>");
+
+            byte[] bytes = Encoding.UTF8.GetBytes(builder.ToString());
+
+            requestContext.Response.ContentLength64 = bytes.Length;
+
+            Stream output = requestContext.Response.OutputStream;
+            output.Write(bytes, 0, bytes.Length);
+            output.Close();
         }
     }
 }

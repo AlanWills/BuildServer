@@ -16,7 +16,7 @@ namespace BuildServer
 
             BuildServerSettings.ReadFile(Path.Combine(Directory.GetCurrentDirectory(), "Settings.xml"));
 
-            using (Server server = new Server(BuildServerSettings.ServerPort))
+            using (Server server = new Server("localhost", BuildServerSettings.ServerPort))
             {
                 Console.WriteLine("Ready");
                 Console.ReadKey(true);

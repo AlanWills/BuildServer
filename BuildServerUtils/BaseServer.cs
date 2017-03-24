@@ -15,82 +15,48 @@ namespace BuildServerUtils
         /// <summary>
         /// The listener we can use to detect incoming connections from clients to the server
         /// </summary>
-        private TcpListener Listener { get; set; }
+        protected HttpListener Listener { get; private set; }
 
-        /// <summary>
-        /// Our interface to the single client we are supporting for now
-        /// </summary>
-        private Comms ClientComms { get; set; } = new Comms();
-
-        /// <summary>
-        /// Determines whether we have clients connected
-        /// </summary>
-        public bool IsConnected { get { return ClientComms != null && ClientComms.IsConnected; } }
-
+        protected string BaseAddress { get; private set; }
+        
         #endregion
 
-        public BaseServer(int port = 1490)
+        public BaseServer(string ip, int port)
         {
-            Listener = new TcpListener(IPAddress.Any, port);
+            BaseAddress = "http://" + ip + ":" + port.ToString();
+
+            Listener = new HttpListener();
             Listener.Start();
-            ListenForNewClient();
+
+            ListenForMessages();
         }
         
         public void Dispose()
         {
-            DisconnectClient();
-            Listener.Stop();
+            Listener.Close();
         }
-
-        /// <summary>
-        /// Starts an asynchronous check for new connections
-        /// </summary>
-        private void ListenForNewClient()
+        
+        private async void ListenForMessages()
         {
-            Listener.BeginAcceptTcpClient(AcceptClient, null);
-        }
+            HttpListenerContext context = await Listener.GetContextAsync();
+            ProcessMessage(context);
 
-        /// <summary>
-        /// Callback for when a new client connects to the server
-        /// </summary>
-        /// <param name="asyncResult"></param>
-        protected virtual void AcceptClient(IAsyncResult asyncResult)
-        {
-            DisconnectClient();
-
-            try
-            {
-                ClientComms = new Comms(Listener.EndAcceptTcpClient(asyncResult));
-                ClientComms.OnDataReceived += ProcessMessage;
-
-                Console.WriteLine("Client connected");
-
-                ListenForNewClient();
-            }
-            catch { }
+            ListenForMessages();
         }
 
         public void Send(string message)
         {
-            if (IsConnected && !string.IsNullOrEmpty(message))
-            {
-                ClientComms.Send(message);
-            }
+            
         }
 
-        public void DisconnectClient()
-        {
-            ClientComms?.Disconnect();
-        }
-        
         #region Message Callbacks
 
         /// <summary>
-        /// A function which is called when the Client sends a message to the server.
+        /// A function which is called when a message is sent to the server.
         /// Override to perform custom message handling
         /// </summary>
         /// <param name="data"></param>
-        protected virtual void ProcessMessage(byte[] data) { }
+        protected virtual void ProcessMessage(HttpListenerContext requestContext) { }
 
         #endregion
     }

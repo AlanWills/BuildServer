@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Diagnostics;
-using System.IO;
-using System.Net.Sockets;
-using System.Text;
-using static BuildServerUtils.Delegates;
+using System.Net.Http;
 
 namespace BuildServerUtils
 {
@@ -15,57 +11,21 @@ namespace BuildServerUtils
     {
         #region Properties and Fields
 
-        private TcpClient Client { get; set; }
-        private MemoryStream ReadStream { get; set; }
-        private MemoryStream WriteStream { get; set; }
-        private BinaryReader Reader { get; set; }
-        private BinaryWriter Writer { get; set; }
-
-        public bool IsConnected { get { return Client != null ? Client.Connected : false; } }
-
-        /// <summary>
-        /// Useful buffer for reading packeted messages from the server
-        /// </summary>
-        private byte[] ReadBuffer { get; set; }
-
-        /// <summary>
-        /// An event that is fired when this Comms receives a message
-        /// </summary>
-        public event OnDataReceived OnDataReceived;
+        private HttpClient Client { get; set; }
 
         #endregion
 
-        public Comms()
-        {
-            ReadStream = new MemoryStream();
-            WriteStream = new MemoryStream();
-            Reader = new BinaryReader(ReadStream);
-            Writer = new BinaryWriter(WriteStream);
-
-            ReadBuffer = new byte[2048];
-        }
-
-        public Comms(TcpClient client) : 
-            this()
-        {
-            Client = client;
-            Client.NoDelay = true;
-
-            StartListening();
-        }
-
+        public Comms() { }
+        
         public void Connect(string ip, int port)
         {
-            Client?.Close();
-            Client = new TcpClient(ip, port);
-            Client.NoDelay = true;
-
-            StartListening();
+            Client = new HttpClient();
+            Client.BaseAddress = new Uri("http://" + ip + ":" + port + "/");
         }
 
         public void Disconnect()
         {
-            Client?.Close();
+            Client?.Dispose();
         }
 
         #region Data Sending Functions
@@ -77,82 +37,10 @@ namespace BuildServerUtils
         /// <param name="str"></param>
         public void Send(string str)
         {
-            if (IsConnected && !string.IsNullOrWhiteSpace(str))
+            if (!string.IsNullOrWhiteSpace(str))
             {
-                SendByteArray(Encoding.UTF8.GetBytes(str));
+                Client.SendAsync(new HttpRequestMessage(HttpMethod.Post, str));
             }
-        }
-
-        /// <summary>
-        /// Send a byte array to our client
-        /// </summary>
-        /// <param name="client"></param>
-        /// <param name="bytes"></param>
-        protected void SendByteArray(byte[] bytes)
-        {
-            if (bytes.Length == 0) { return; }
-
-            Writer.Write(bytes);
-
-            int bytesWritten = (int)WriteStream.Position;
-            byte[] result = new byte[bytesWritten];
-
-            WriteStream.Position = 0;
-            WriteStream.Read(result, 0, bytesWritten);
-            WriteStream.Position = 0;
-
-            Client.GetStream().BeginWrite(result, 0, result.Length, null, null);
-            Writer.Flush();
-        }
-
-        #endregion
-
-        #region Data Receiving Functions
-
-        /// <summary>
-        /// Start listening for messages from the server
-        /// </summary>
-        private void StartListening()
-        {
-            try
-            {
-                Client.GetStream().BeginRead(ReadBuffer, 0, 2048, StreamReceived, null);
-            }
-            catch
-            {
-                
-            }
-        }
-
-        /// <summary>
-        /// Callback which processes a message sent from the server
-        /// </summary>
-        /// <param name="ar"></param>
-        private void StreamReceived(IAsyncResult ar)
-        {
-            int bytesRead = 0;
-            try
-            {
-                lock (Client.GetStream())
-                {
-                    bytesRead = Client.GetStream().EndRead(ar);
-                }
-            }
-            catch { }
-
-            //Create the byte array with the number of bytes read
-            byte[] data = new byte[bytesRead];
-
-            //Populate the array
-            for (int i = 0; i < bytesRead; i++)
-            {
-                data[i] = ReadBuffer[i];
-            }
-
-            OnDataReceived?.Invoke(data);
-
-            //Listen for new data
-            StartListening();
         }
 
         #endregion

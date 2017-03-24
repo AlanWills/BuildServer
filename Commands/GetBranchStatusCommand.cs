@@ -1,5 +1,7 @@
 ﻿using BuildServerUtils;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Linq;
 using System.Text;
 
 namespace BuildServer
@@ -7,28 +9,32 @@ namespace BuildServer
     [Command(CommandStrings.GetBranchStatus)]
     public class GetBranchStatusCommand : IServerCommand
     {
-        public void Execute(BaseServer baseServer, List<string> arguments)
+        public string Execute(BaseServer baseServer, NameValueCollection arguments)
         {
             Server server = baseServer as Server;
 
-            if (arguments.Contains(CommandStrings.All))
+            List<string> branches = arguments.GetValues("branch")?.ToList();
+
+            if (branches.Contains(CommandStrings.All))
             {
                 // If the user passes all, we use all the branch statuses
-                arguments.Clear();
-                arguments.AddRange(server.Branches.Keys);
+                branches.Clear();
+                branches.AddRange(server.Branches.Keys);
             }
 
-            foreach (string branchName in arguments)
+            StringBuilder stringBuilder = new StringBuilder();
+
+            foreach (string branchName in branches)
             {
-                StringBuilder stringBuilder = new StringBuilder("Branch " + branchName + " does not exist on Build Server");
                 if (server.Branches.ContainsKey(branchName))
                 {
-                    stringBuilder.Clear();
-                    stringBuilder.Append("Branch " + branchName + " has status: " + server.Branches[branchName].TestingState.DisplayString());
+                    stringBuilder.AppendLine("<p>Branch " + branchName + " has status: " + server.Branches[branchName].TestingState.DisplayString() + "</p>");
                 }
 
                 baseServer.Send(stringBuilder.ToString());
             }
+
+            return stringBuilder.ToString();
         }
     }
 }

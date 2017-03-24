@@ -24,11 +24,6 @@ namespace BuildServerClient
             ClientSettings.ReadFile();
             Client client = new Client(ClientSettings.ServerIP, ClientSettings.ServerPort);
 
-            if (!client.IsConnected)
-            {
-                Console.WriteLine("Use 'reconnect' to try again.");
-            }
-
             Console.WriteLine("\nReady");
 
             foreach (Type type in Assembly.GetExecutingAssembly().GetTypes().Where(x => x.GetCustomAttribute<CommandAttribute>() != null))
@@ -70,8 +65,6 @@ namespace BuildServerClient
                     }
                 }
             }
-
-            client.Disconnect();
         }
 
         private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)

@@ -12,68 +12,13 @@ namespace BuildServerUtils
     /// </summary>
     public abstract class BaseClient
     {
-        #region Properties and Fields
-
-        /// <summary>
-        /// The interface to the server
-        /// </summary>
-        private Comms ServerComms { get; set; } = new Comms();
-
-        /// <summary>
-        /// Wrapper property for checking that the ServerComms is connected.
-        /// </summary>
-        public bool IsConnected { get { return ServerComms.IsConnected; } }
-
-        #endregion
-
         public BaseClient(string ipAddress, int portNumber = 1490)
         {
-            // Attempt to connect
-            string error = "";
-            if (TryConnect(ipAddress, portNumber, ref error))
-            {
-                Console.WriteLine("Connection succeeded");
-            }
-            else
-            {
-                Console.WriteLine("Connection failed");
-            }
         }
-
-        public virtual void Disconnect()
-        {
-            ServerComms?.Disconnect();
-        }
-
-        /// <summary>
-        /// Attempts to connect to the inputted ip through the inputted port.
-        /// </summary>
-        /// <param name="ipAddress"></param>
-        /// <param name="portNumber"></param>
-        /// <param name="errorMessage"></param>
-        /// <returns></returns>
-        public bool TryConnect(string ipAddress, int portNumber, ref string errorMessage)
-        {
-            try
-            {
-                ServerComms.Connect(ipAddress, portNumber);
-                ServerComms.OnDataReceived += OnMessageReceived;
-
-                return true;
-            }
-            catch (Exception e)
-            {
-                errorMessage = e.Message;
-                return false;
-            }
-        }
-
+        
         public void Send(string message)
         {
-            if (IsConnected && !string.IsNullOrEmpty(message))
-            {
-                ServerComms.Send(message);
-            }
+            
         }
 
         #region Callbacks

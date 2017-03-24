@@ -48,7 +48,6 @@
     <Compile Include="IClientCommand.cs" />
     <Compile Include="IServerCommand.cs" />
     <Compile Include="Comms.cs" />
-    <Compile Include="Delegates.cs" />
     <Compile Include="ExtensionFunctions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -11,15 +11,7 @@ namespace BuildServerClient
         {
 
         }
-
-        public override void Disconnect()
-        {
-            if (IsConnected)
-            {
-                new QuitCommand().Execute(this, new List<string>());
-            }
-        }
-
+        
         protected override void OnMessageReceived(byte[] data)
         {
             string dataString = data.ConvertToString();

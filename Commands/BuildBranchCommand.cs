@@ -1,37 +1,26 @@
 ﻿using BuildServerUtils;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 
 namespace BuildServer
 {
     [Command(CommandStrings.BuildBranch)]
-    public class BuildCurrentBranchCommand : IServerCommand
+    public class BuildBranchCommand : IServerCommand
     {
-        public void Execute(BaseServer baseServer, List<string> arguments)
+        public string Execute(BaseServer baseServer, NameValueCollection arguments)
         {
             Server server = baseServer as Server;
 
             if (arguments.Count != 3)
             {
-                Console.WriteLine("Not enough parameters to build command");
-                return;
+                return "Not enough parameters to build command";
             }
 
-            string branchName = arguments[0];
-            Console.WriteLine("Branch name = " + branchName);
-
-            string email = arguments[1];
-            Console.WriteLine("Email = " + email);
-
-            string notifySetting = arguments[2];
-            Console.WriteLine("NotifySetting = " + notifySetting);
-
-            if (baseServer.IsConnected)
-            {
-                // Notify the user
-                baseServer.Send("build Command received by Build Server");
-            }
+            string branchName = arguments.GetValues("branch")?[0];
+            string email = arguments.GetValues("email")?[0];
+            string notifySetting = arguments.GetValues("email_on_fail_only")?[0];
 
             if (!server.Branches.ContainsKey(branchName))
             {
@@ -39,6 +28,8 @@ namespace BuildServer
             }
 
             server.Branches[branchName].Build(email, notifySetting);
+
+            return "build Command received by Build Server";
         }
     }
 }

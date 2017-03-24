@@ -1,6 +1,7 @@
 ﻿using BuildServerUtils;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,27 +11,26 @@ namespace BuildServer.Commands
     [Command(CommandStrings.GetFailedTests)]
     public class GetFailedTestsCommand : IServerCommand
     {
-        public void Execute(BaseServer baseServer, List<string> arguments)
+        public string Execute(BaseServer baseServer, NameValueCollection arguments)
         {
-            if (arguments.Count < 1)
+            string[] branches = arguments.GetValues("branch");
+
+            if (branches.Length < 1)
             {
-                baseServer.Send("No branch passed to " + CommandStrings.GetFailedTests);
-                return;
+                return "No branch passed to " + CommandStrings.GetFailedTests;
             }
 
             Server server = baseServer as Server;
-            string branchName = arguments[0];
+            string branchName = branches[0];
             
             if (!server.Branches.ContainsKey(branchName))
             {
-                baseServer.Send("Branch " + branchName + " does not exist on the build server");
-                return;
+                return "Branch " + branchName + " does not exist on the build server";
             }
 
             if (server.Branches[branchName].TestingState == Branch.TestState.kUntested)
             {
-                baseServer.Send("Branch " + branchName + " has not been tested yet");
-                return;
+                return "Branch " + branchName + " has not been tested yet";
             }
 
             HistoryFile file = new HistoryFile(server.Branches[branchName].OrderedHistoryFiles.First());
@@ -39,18 +39,17 @@ namespace BuildServer.Commands
             List<string> failedTests = file.FailedTests;
             if (failedTests.Count == 0)
             {
-                baseServer.Send("Branch " + branchName + " has no failed tests");
-                return;
+                return "Branch " + branchName + " has no failed tests";
             }
 
             StringBuilder str = new StringBuilder();
 
             foreach (string testName in file.FailedTests)
             {
-                str.AppendLine(testName);
+                str.AppendLine("<p>" + testName + "</p>");
             }
 
-            baseServer.Send(str.ToString());
+            return str.ToString();
         }
     }
 }
