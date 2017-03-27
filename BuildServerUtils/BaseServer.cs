@@ -43,12 +43,7 @@ namespace BuildServerUtils
 
             ListenForMessages();
         }
-
-        public void Send(string message)
-        {
-            
-        }
-
+        
         #region Message Callbacks
 
         /// <summary>

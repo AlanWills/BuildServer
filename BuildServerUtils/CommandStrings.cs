@@ -19,5 +19,9 @@ namespace BuildServerUtils
         public const string All = "all";
         public const string Branch = "branch";
         public const string GetFailedTests = "/failedtests";
+        public const string GetLog = "/log";
+        public const string BuildLog = "build";
+        public const string TestLog = "test";
+        public const string Latest = "latest";
     }
 }

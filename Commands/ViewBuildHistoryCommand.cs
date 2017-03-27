@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -47,18 +48,26 @@ namespace BuildServer
 
             for (int i = 0, n = Math.Min(quantity, historyFiles.Count); i < n; ++i)
             {
-                historyInfo.AppendLine("<p>" + GetHistoryFileInfo(server, historyFiles[i]) + "</p>");
+                GetHistoryFileInfo(historyInfo, server, branchName, historyFiles[i]);
             }
 
             return historyInfo.ToString();
         }
 
-        private string GetHistoryFileInfo(BaseServer baseServer, string filePath)
+        private void GetHistoryFileInfo(StringBuilder builder, Server server, string branchName, string filePath)
         {
+            string parentDirName = Directory.GetParent(filePath).Name;
+
             HistoryFile historyFile = new HistoryFile(filePath);
             historyFile.Load();
 
-            return historyFile.Status.DisplayString();
+            builder.Append("<p><a href=\"");
+            builder.Append(server.BaseAddress + CommandStrings.GetFailedTests + "?branch=" + branchName + "&dir=" + parentDirName);
+            builder.Append("\">");
+            builder.Append(parentDirName);
+            builder.Append("</a>:  ");
+            builder.Append(historyFile.Status.DisplayString());
+            builder.AppendLine("</p>");;
         }
     }
 }

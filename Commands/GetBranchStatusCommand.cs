@@ -32,8 +32,6 @@ namespace BuildServer
                 {
                     GetBranchTestStateString(stringBuilder, server, branchName);
                 }
-
-                baseServer.Send(stringBuilder.ToString());
             }
 
             return stringBuilder.ToString();

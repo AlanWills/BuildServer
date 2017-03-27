@@ -46,9 +46,9 @@ namespace BuildServerUtils
                 HttpResponseMessage message = await Client.SendAsync(new HttpRequestMessage(method, uri));
                 string result = await message.Content.ReadAsStringAsync();
 
-                ResponseReceived?.Invoke();
-
                 Console.WriteLine(result);
+
+                ResponseReceived?.Invoke();
             }
         }
 

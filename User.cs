@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BuildServerUtils;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -55,8 +56,10 @@ namespace BuildServer
 
             DateTime buildCompleteTime = DateTime.Now;
 
-            testRunInformation.AppendLine();
-            testRunInformation.Append("Build Request completed at " + buildCompleteTime.ToShortTimeString());
+            testRunInformation.AppendLine("Build Request completed at " + buildCompleteTime.ToShortTimeString());
+
+            string url = "http://" + ServerIP + ":" + ServerPort + CommandStrings.GetFailedTests + "?branch=" + branchName;
+            testRunInformation.AppendLine("<a href=\"" + url + "\"/>");
 
             try
             {
