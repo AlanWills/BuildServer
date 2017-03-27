@@ -58,8 +58,9 @@ namespace BuildServer
 
             testRunInformation.AppendLine("Build Request completed at " + buildCompleteTime.ToShortTimeString());
 
-            string url = "http://" + ServerIP + ":" + ServerPort + CommandStrings.GetFailedTests + "?branch=" + branchName;
-            testRunInformation.AppendLine("<a href=\"" + url + "\"/>");
+            // Hard coded proxy port for now
+            string url = "http://" + ServerIP + ":1491" + CommandStrings.GetFailedTests + "?branch=" + branchName;
+            testRunInformation.AppendLine(url);
 
             try
             {
