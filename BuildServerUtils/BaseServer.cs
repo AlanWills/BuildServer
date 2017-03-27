@@ -17,7 +17,7 @@ namespace BuildServerUtils
         /// </summary>
         protected HttpListener Listener { get; private set; }
 
-        protected string BaseAddress { get; private set; }
+        public string BaseAddress { get; private set; }
         
         #endregion
 

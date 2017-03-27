@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Root>
-  <ServerIP>localhost</ServerIP>
+  <ServerIP>10.84.104.172</ServerIP>
   <ServerPort>1490</ServerPort>
   <ServerEmail></ServerEmail>
   <ServerEmailUsername></ServerEmailUsername>

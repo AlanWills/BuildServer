@@ -1,8 +1,10 @@
 ﻿using BuildServerUtils;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using static BuildServer.Branch;
 
 namespace BuildServer
 {
@@ -28,13 +30,54 @@ namespace BuildServer
             {
                 if (server.Branches.ContainsKey(branchName))
                 {
-                    stringBuilder.AppendLine("<p>Branch " + branchName + " has status: " + server.Branches[branchName].TestingState.DisplayString() + "</p>");
+                    GetBranchTestStateString(stringBuilder, server, branchName);
                 }
 
                 baseServer.Send(stringBuilder.ToString());
             }
 
             return stringBuilder.ToString();
+        }
+        
+        private string GetBranchTestStateString(StringBuilder builder, Server server, string branchName)
+        {
+            Branch branch = server.Branches[branchName];
+
+            builder.Append("<p><a style=\"font-weight:bold\" href=\"");
+            builder.Append(server.BaseAddress + CommandStrings.ViewBuildHistory);
+            builder.Append("?branch=" + branchName);
+            builder.Append("\">");
+            builder.Append(branchName);
+            builder.Append("</a>");
+            builder.Append(" has test status: ");
+            builder.Append("<a style=\"color:");
+            builder.Append(GetTestStateColour(branch.TestingState));
+            builder.Append("\" href=\"");
+            builder.Append(server.BaseAddress + CommandStrings.GetFailedTests);
+            builder.Append("?branch=" + branchName);
+            builder.Append("\">");
+            builder.Append(branch.TestingState.DisplayString() + "</a></p>");
+
+            return builder.ToString();
+        }
+
+        private string GetTestStateColour(TestState state)
+        {
+            switch (state)
+            {
+                case TestState.kPassed:
+                    return "green";
+
+                case TestState.kFailed:
+                    return "red";
+
+                case TestState.kUntested:
+                    return "yellow";
+
+                default:
+                    Debug.Fail("Unresolved test state colour");
+                    return "black";
+            }
         }
     }
 }
