@@ -29,7 +29,7 @@ namespace BuildServer
                 return "Branch " + branchName + " not registered on server";
             }
 
-            StringBuilder historyInfo = new StringBuilder();
+            StringBuilder historyInfo = new StringBuilder("<h2>" + branchName + " Build History</h2>");
 
             string[] quantities = arguments.GetValues("quantity");
             string quantityString = quantities?.Length > 0 ? quantities[0] : "10";
@@ -43,7 +43,7 @@ namespace BuildServer
             }
             else if(!int.TryParse(quantityString, out quantity))
             {
-                return quantityString + " is not a valid quantity";
+                historyInfo.AppendLine(quantityString + " is not a valid quantity");
             }
 
             for (int i = 0, n = Math.Min(quantity, historyFiles.Count); i < n; ++i)
@@ -61,13 +61,13 @@ namespace BuildServer
             HistoryFile historyFile = new HistoryFile(filePath);
             historyFile.Load();
 
-            builder.Append("<p><a href=\"");
+            builder.Append("<pre><a href=\"");
             builder.Append(server.BaseAddress + CommandStrings.GetFailedTests + "?branch=" + branchName + "&dir=" + parentDirName);
             builder.Append("\">");
             builder.Append(parentDirName);
             builder.Append("</a>:  ");
             builder.Append(historyFile.Status.DisplayString());
-            builder.AppendLine("</p>");;
+            builder.AppendLine("</pre>");;
         }
     }
 }

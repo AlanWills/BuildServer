@@ -16,7 +16,7 @@ namespace BuildServer.Commands
         {
             string[] branches = arguments.GetValues(CommandStrings.Branch);
 
-            if (branches.Length < 1)
+            if (branches == null)
             {
                 return "No branch passed to " + CommandStrings.GetFailedTests;
             }
@@ -35,15 +35,9 @@ namespace BuildServer.Commands
             }
 
             string[] dirs = arguments.GetValues("dir");
-
-            if (dirs.Length < 1)
-            {
-                return "No directory passed to " + CommandStrings.GetFailedTests;
-            }
-
-            string dir = dirs[0];
-
             List<string> historyFiles = server.Branches[branchName].OrderedHistoryFiles;
+            string dir = (dirs == null || dirs[0] == CommandStrings.Latest) ? Directory.GetParent(historyFiles[0]).Name : dirs[0];
+
             if (!historyFiles.Exists(x => Directory.GetParent(x).Name == dir))
             {
                 return "Build with inputted directory does not exist";
@@ -52,15 +46,18 @@ namespace BuildServer.Commands
             HistoryFile file = new HistoryFile(historyFiles.Find(x => Directory.GetParent(x).Name == dir));
             file.Load();
 
-            StringBuilder str = new StringBuilder();
-            str.AppendLine("<a href=\"" + server.BaseAddress + CommandStrings.GetLog + "?logtype=" + CommandStrings.BuildLog + "&" + CommandStrings.Branch + "=" + branchName + "\">Build Log</a>");
-            str.AppendLine("<a href=\"" + server.BaseAddress + CommandStrings.GetLog + "?logtype=" + CommandStrings.TestLog + "&" + CommandStrings.Branch + "=" + branchName + "\">Test Log</a>");
+            StringBuilder str = new StringBuilder("<h2>Build Information</h2>");
+            str.AppendLine("<h3>Log Files</h3>");
+            str.AppendLine("<p><a href=\"" + server.BaseAddress + CommandStrings.GetLog + "?logtype=" + CommandStrings.BuildLog + "&" + CommandStrings.Branch + "=" + branchName + "\">Build Log</a></p>");
+            str.AppendLine("<p><a href=\"" + server.BaseAddress + CommandStrings.GetLog + "?logtype=" + CommandStrings.TestLog + "&" + CommandStrings.Branch + "=" + branchName + "\">Test Log</a></p>");
 
             List<string> failedTests = file.FailedTests;
             if (failedTests.Count == 0)
             {
-                str.AppendLine("<p>Branch " + branchName + " has no failed tests</p>");
+                str.AppendLine("<p>Branch passed successfully</p>");
             }
+
+            str.AppendLine("<h3>Failed Tests</h3>");
 
             foreach (string testName in file.FailedTests)
             {

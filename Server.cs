@@ -34,7 +34,7 @@ namespace BuildServer
         {
             foreach (Type type in Assembly.GetExecutingAssembly().GetTypes().Where(x => x.GetCustomAttribute<CommandAttribute>() != null))
             {
-                Listener.Prefixes.Add(BaseAddress + type.GetCustomAttribute<CommandAttribute>().Token + "/");
+                Listener.Prefixes.Add("http://*:" + port.ToString() + type.GetCustomAttribute<CommandAttribute>().Token + "/");
                 CommandRegistry.Add(type.GetCustomAttribute<CommandAttribute>().Token, Activator.CreateInstance(type) as IServerCommand);
             }
 

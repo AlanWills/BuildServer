@@ -41,20 +41,21 @@ namespace BuildServer
         {
             Branch branch = server.Branches[branchName];
 
-            builder.Append("<p><a style=\"font-weight:bold\" href=\"");
+            builder.Append("<h2><a style=\"font-weight:bold\" href=\"");
             builder.Append(server.BaseAddress + CommandStrings.ViewBuildHistory);
             builder.Append("?branch=" + branchName);
             builder.Append("\">");
             builder.Append(branchName);
-            builder.Append("</a>");
-            builder.Append(" has test status: ");
+            builder.Append("</a></h2>");
+            builder.Append("<pre>Latest Build:   ");
             builder.Append("<a style=\"color:");
             builder.Append(GetTestStateColour(branch.TestingState));
             builder.Append("\" href=\"");
             builder.Append(server.BaseAddress + CommandStrings.GetFailedTests);
             builder.Append("?branch=" + branchName);
+            builder.Append("&dir=" + CommandStrings.Latest);
             builder.Append("\">");
-            builder.Append(branch.TestingState.DisplayString() + "</a></p>");
+            builder.Append(branch.TestingState.DisplayString() + "</a></pre><br/>");
 
             return builder.ToString();
         }
