@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,17 +14,36 @@ namespace BuildServer
         {
             switch (testState)
             {
-                case TestState.kPassed:
+                case TestState.Passed:
                     return "Passed";
 
-                case TestState.kFailed:
+                case TestState.Failed:
                     return "Failed";
 
-                case TestState.kUntested:
+                case TestState.Untested:
                     return "Untested";
 
                 default:
                     return "Unknown State";
+            }
+        }
+
+        public static string Colour(this TestState state)
+        {
+            switch (state)
+            {
+                case TestState.Passed:
+                    return "green";
+
+                case TestState.Failed:
+                    return "red";
+
+                case TestState.Untested:
+                    return "yellow";
+
+                default:
+                    Debug.Fail("Unresolved test state colour");
+                    return "black";
             }
         }
     }

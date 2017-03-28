@@ -48,28 +48,21 @@ namespace BuildServer
 
             builder.CreatePreservedParagraph("Latest Build:   ")
                    .CreateLink(server.BaseAddress + CommandStrings.GetFailedTests + "?branch=" + branchName + "&dir=" + CommandStrings.Latest, branch.TestingState.DisplayString())
-                   .AddStyling(new Tuple<string, string>("color", GetTestStateColour(branch.TestingState)));
+                   .AddStyling(new Tuple<string, string>("color", branch.TestingState.Colour()));
+
+            builder.CreatePreservedParagraph("Status:         " + (branch.BuildingState.ToString()));
+            builder.CreatePreservedParagraph("Build Queued:   " + (branch.Queued ? "Yes" : "No"));
+
+            if (branch.BuildingState == BuildState.Paused)
+            {
+                builder.CreateButton("Resume", server.BaseAddress + CommandStrings.ResumeBranch + "?" + CommandStrings.Branch + "=" + branchName);
+            }
+            else if (branch.BuildingState == BuildState.Building)
+            {
+                builder.CreateButton("Pause", server.BaseAddress + CommandStrings.PauseBranch + "?" + CommandStrings.Branch + "=" + branchName);
+            }
 
             return builder.ToString();
-        }
-
-        private string GetTestStateColour(TestState state)
-        {
-            switch (state)
-            {
-                case TestState.kPassed:
-                    return "green";
-
-                case TestState.kFailed:
-                    return "red";
-
-                case TestState.kUntested:
-                    return "yellow";
-
-                default:
-                    Debug.Fail("Unresolved test state colour");
-                    return "black";
-            }
         }
     }
 }

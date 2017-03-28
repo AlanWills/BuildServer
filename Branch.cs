@@ -12,20 +12,63 @@ namespace BuildServer
 {
     public class Branch
     {
+        public enum BuildState
+        {
+            Building,
+            Idle,
+            Paused
+        }
+
         public enum TestState
         {
-            kPassed,
-            kFailed,
-            kUntested
+            Passed,
+            Failed,
+            Untested
         }
 
         #region Properties and Fields
 
         private object branchLock = new object();
 
-        private bool Building { get; set; }
+        private object buildingLock = new object();
+        private BuildState buildingState = BuildState.Idle;
+        public BuildState BuildingState
+        {
+            get
+            {
+                lock (buildingLock)
+                {
+                    return buildingState;
+                }
+            }
+            set
+            {
+                lock (buildingLock)
+                {
+                    buildingState = value;
+                }
+            }
+        }
 
-        private bool Queued { get; set; }
+        private object queueLock = new object();
+        private bool queued = false;
+        public bool Queued
+        {
+            get
+            {
+                lock (queueLock)
+                {
+                    return queued;
+                }
+            }
+            set
+            {
+                lock (queueLock)
+                {
+                    queued = value;
+                }
+            }
+        }
 
         public List<string> OrderedHistoryFiles
         {
@@ -45,7 +88,7 @@ namespace BuildServer
 
                 if (string.IsNullOrEmpty(mostRecentHistoryFile))
                 {
-                    return TestState.kUntested;
+                    return TestState.Untested;
                 }
 
                 HistoryFile file = new HistoryFile(mostRecentHistoryFile);
@@ -70,24 +113,27 @@ namespace BuildServer
 
         public void Build()
         {
-            lock (branchLock)
+            if (BuildingState == BuildState.Paused)
             {
-                if (Building)
-                {
-                    // If we're already building, we don't build again but queue another
-                    Queued = true;
-                    Console.WriteLine("Build already underway so another will be queued");
-
-                    return;
-                }
-
-                // Now set the branch to be building
-                Building = true;
-
-                // If we weren't queued, it doesn't matter
-                // If we were queued, we are now building so we shouldn't be any more
-                Queued = false;
+                // This will still preseve the queued builds so that when we resume we will build automatically
+                Console.WriteLine("Build paused so request ignored");
+                return;
             }
+            else if (BuildingState == BuildState.Building)
+            {
+                // If we're already building, we don't build again but queue another
+                Queued = true;
+                Console.WriteLine("Build already underway so another will be queued");
+
+                return;
+            }
+
+            // Now set the branch to be building
+            BuildingState = BuildState.Building;
+
+            // If we weren't queued, it doesn't matter
+            // If we were queued, we are now building so we shouldn't be any more
+            Queued = false;
 
             // Build and test in separate task to not block main build server from testing other projects
             Task.Run(() =>
@@ -127,15 +173,16 @@ namespace BuildServer
 
                 ReadFilesAndSendMessage(testLogFilePath);
 
-                bool queued = false;
-                lock (branchLock)
+                if (BuildingState == BuildState.Paused)
                 {
-                    // Now set the branch to be finished building
-                    Building = false;
-                    queued = Queued;
+                    // If we have paused we should just quit here now
+                    return;
                 }
 
-                if (queued)
+                // Now set the branch to be finished building
+                BuildingState = BuildState.Idle;
+
+                if (Queued)
                 {
                     Build();
                 }
@@ -157,6 +204,26 @@ namespace BuildServer
             }
 
             Build();
+        }
+
+        /// <summary>
+        /// Sets the build state to paused.
+        /// </summary>
+        public void Pause()
+        {
+            BuildingState = BuildState.Paused;
+        }
+
+        /// <summary>
+        /// Sets the build state to idle and if we had a build queued, we trigger a build.
+        /// </summary>
+        public void Resume()
+        {
+            BuildingState = BuildState.Idle;
+            if (Queued)
+            {
+                Build();
+            }
         }
 
         /// <summary>

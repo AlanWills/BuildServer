@@ -29,7 +29,7 @@ namespace BuildServer.Commands
                 return "Branch " + branchName + " does not exist on the build server";
             }
 
-            if (server.Branches[branchName].TestingState == Branch.TestState.kUntested)
+            if (server.Branches[branchName].TestingState == Branch.TestState.Untested)
             {
                 return "Branch " + branchName + " has not been tested yet";
             }
@@ -47,7 +47,7 @@ namespace BuildServer.Commands
             file.Load();
 
             HTMLWriter writer = new HTMLWriter();
-
+            writer.CreateLink(server.BaseAddress + CommandStrings.ViewBuildHistory + "?branch=" + branchName, "Build History");
             writer.CreateH2("Build Information");
             writer.CreateH3("LogFiles");
             writer.CreateParagraph("")

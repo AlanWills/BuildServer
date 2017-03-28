@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace BuildServerClient
 {
     [Command(CommandStrings.GetLog)]
-    public class GetBranchLogFile : IClientCommand
+    public class GetBranchLogFileCommand : IClientCommand
     {
         public string Description
         {

@@ -54,6 +54,8 @@
   <ItemGroup>
     <Compile Include="Branch.cs" />
     <Compile Include="BuildServerSettings.cs" />
+    <Compile Include="Commands\ResumeBranchCommand.cs" />
+    <Compile Include="Commands\PauseBranchCommand.cs" />
     <Compile Include="Commands\BuildBranchCommand.cs" />
     <Compile Include="Commands\GetBranchLogFile.cs" />
     <Compile Include="Commands\GetBranchStatusCommand.cs" />

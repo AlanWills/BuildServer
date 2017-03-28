@@ -14,7 +14,7 @@ namespace BuildServer
 
         private string FilePath { get; set; }
 
-        public TestState Status { get; private set; } = TestState.kUntested;
+        public TestState Status { get; private set; } = TestState.Untested;
 
         public List<string> FailedTests { get; private set; } = new List<string>();
 
@@ -36,11 +36,11 @@ namespace BuildServer
                 string testState = statusNodes[0].InnerText;
                 if (testState == bool.TrueString)
                 {
-                    Status = TestState.kPassed;
+                    Status = TestState.Passed;
                 }
                 else if (testState == bool.FalseString)
                 {
-                    Status = TestState.kFailed;
+                    Status = TestState.Failed;
                 }
             }
 

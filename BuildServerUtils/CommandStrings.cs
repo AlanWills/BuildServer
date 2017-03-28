@@ -23,5 +23,7 @@ namespace BuildServerUtils
         public const string BuildLog = "build";
         public const string TestLog = "test";
         public const string Latest = "latest";
+        public const string PauseBranch = "/pause";
+        public const string ResumeBranch = "/resume";
     }
 }

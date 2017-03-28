@@ -65,6 +65,17 @@ namespace BuildServerUtils
             return CreateChild("p", text);
         }
 
+        public HTMLElement CreateButton(string label, string destinationURL)
+        {
+            return CreateChild("form", "")
+                        .AddAttribute("action", destinationURL)
+                        .AddAttribute("method", "post")
+                        .AddAttribute("target", "_blank")
+                        .CreateChild("input", "")
+                            .AddAttribute("type", "submit")
+                            .AddAttribute("value", label);
+        }
+
         public HTMLElement CreatePreservedParagraph(string text)
         {
             return CreateChild("pre", text);
@@ -72,8 +83,8 @@ namespace BuildServerUtils
 
         public HTMLElement CreateLink(string link, string text)
         {
-            HTMLElement element = CreateChild("a", text);
-            return element.AddAttribute("href", link);
+            return CreateChild("a", text).
+                        AddAttribute("href", link);
         }
     }
 }

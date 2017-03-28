@@ -41,7 +41,7 @@ namespace BuildServer
                 return "Branch " + branchName + " not registered on server";
             }
 
-            if (server.Branches[branchName].TestingState == Branch.TestState.kUntested)
+            if (server.Branches[branchName].TestingState == Branch.TestState.Untested)
             {
                 return "Branch " + branchName + " has not been built yet";
             }

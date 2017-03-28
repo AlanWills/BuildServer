@@ -30,7 +30,7 @@ namespace BuildServer
             }
 
             HTMLWriter writer = new HTMLWriter();
-
+            writer.CreateLink(server.BaseAddress + CommandStrings.GetBranchStatus + "?branch=all", "Branches");
             writer.CreateH2(branchName + " Build History");
 
             string[] quantities = arguments.GetValues("quantity");
