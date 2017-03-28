@@ -1,9 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Root>
-  <!--<ServerIP>10.84.104.172</ServerIP>-->
-  <!--<ServerPort>1490</ServerPort>-->
-  <ServerIP>jenkins.grow.am</ServerIP>
-  <ServerPort>1491</ServerPort>
+  <ServerIP>192.168.0.25</ServerIP>
+  <ServerPort>1490</ServerPort>
   <Email>alan@grow.am</Email>
   <!--Put N here for all build updates-->
   <OnlyEmailOnFail>N</OnlyEmailOnFail>

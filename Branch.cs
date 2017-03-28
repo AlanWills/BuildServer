@@ -103,8 +103,6 @@ namespace BuildServer
 
         public Dictionary<string, User> Notifiers { get; private set; } = new Dictionary<string, User>();
 
-        private const string ProjectGithubRepoName = "GrowDesktop";
-
         #endregion
 
         public Branch(string branchName)
@@ -239,9 +237,9 @@ namespace BuildServer
 
             if (!Directory.Exists(repoDir))
             {
-                Console.WriteLine("Cloning " + ProjectGithubRepoName + " into " + repoDir);
+                Console.WriteLine("Cloning " + BuildServerSettings.RepositoryURL + " into " + repoDir);
                 // Clone the branch if we do not have it checked out
-                CmdLineUtils.PerformCommand(CmdLineUtils.Git, Directory.GetCurrentDirectory(), "clone -b " + BranchName + " --single-branch https://github.com/GrowSoftware/" + ProjectGithubRepoName + ".git " + BranchName);
+                CmdLineUtils.PerformCommand(CmdLineUtils.Git, Directory.GetCurrentDirectory(), "clone -b " + BranchName + " --single-branch " + BuildServerSettings.RepositoryURL + " " + BranchName);
             }
 
             Console.WriteLine("Making " + BranchName + " up to date");

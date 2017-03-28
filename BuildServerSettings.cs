@@ -13,6 +13,8 @@ namespace BuildServer
     {
         #region Properties and Fields
 
+        public static string RepositoryURL { get; private set; }
+
         public static string ServerIP { get; private set; }
 
         public static int ServerPort { get; private set; }
@@ -40,6 +42,20 @@ namespace BuildServer
 
             XmlDocument document = new XmlDocument();
             document.Load(filePath);
+
+            // Repository URL
+            {
+                XmlNodeList repoURL = document.GetElementsByTagName("RepositoryURL");
+                if (repoURL.Count != 1 || string.IsNullOrEmpty(repoURL[0].InnerText))
+                {
+                    Console.WriteLine("No Repository URL in Settings File.");
+                }
+                else
+                {
+                    RepositoryURL = repoURL[0].InnerText;
+                    Console.WriteLine("RepositoryURL = " + RepositoryURL);
+                }
+            }
 
             // Server IP
             {
