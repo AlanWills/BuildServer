@@ -52,6 +52,8 @@
   <ItemGroup>
     <Compile Include="ClientSettings.cs" />
     <Compile Include="Commands\BuildBranchCommand.cs" />
+    <Compile Include="Commands\AddBranchCommand.cs" />
+    <Compile Include="Commands\DeleteBranchCommand.cs" />
     <Compile Include="Commands\EditSettingsCommand.cs" />
     <Compile Include="Commands\GetBranchLogFileCommand.cs" />
     <Compile Include="Commands\GetBranchStatusCommand.cs" />

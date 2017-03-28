@@ -24,7 +24,7 @@ namespace BuildServer
 
             if (!server.Branches.ContainsKey(branchName))
             {
-                server.Branches.Add(branchName, new Branch(branchName));
+                return "Branch not registered on build server";
             }
 
             server.Branches[branchName].Build(email, notifySetting);

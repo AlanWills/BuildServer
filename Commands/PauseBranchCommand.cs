@@ -27,7 +27,7 @@ namespace BuildServer
 
             server.Branches[branchName].Pause();
 
-            return CommandStrings.PauseBranch + " Command received by Build Server";
+            return "Branch now paused";
         }
     }
 }

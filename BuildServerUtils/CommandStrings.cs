@@ -25,5 +25,7 @@ namespace BuildServerUtils
         public const string Latest = "latest";
         public const string PauseBranch = "/pause";
         public const string ResumeBranch = "/resume";
+        public const string DeleteBranch = "/delete";
+        public const string AddBranch = "/add";
     }
 }

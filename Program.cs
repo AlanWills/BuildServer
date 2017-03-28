@@ -20,7 +20,7 @@ namespace BuildServer
             using (Server server = new Server(ServerIP, ServerPort, ClientPort))
             {
                 Console.WriteLine("Ready");
-                Console.ReadKey(true);
+                while (true) { }
             }
         }
 

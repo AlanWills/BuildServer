@@ -27,7 +27,7 @@ namespace BuildServer
 
             server.Branches[branchName].Resume();
 
-            return CommandStrings.ResumeBranch + " Command received by Build Server";
+            return "Branch now resumed";
         }
     }
 }
