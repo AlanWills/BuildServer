@@ -75,8 +75,9 @@ namespace BuildServer
             get
             {
                 // Use current directory here as we will be modifying the Environment directory when building
-                return Directory.EnumerateFiles(Path.Combine(Directory.GetCurrentDirectory(), BranchName, "Build Server"), "*History.xml", SearchOption.AllDirectories).
-                                        OrderByDescending(x => new FileInfo(x).LastWriteTime).ToList();
+                string directory = Path.Combine(Directory.GetCurrentDirectory(), BranchName, "Build Server");
+                return (Directory.Exists(directory) ? Directory.EnumerateFiles(Path.Combine(Directory.GetCurrentDirectory(), BranchName, "Build Server"), "*History.xml", SearchOption.AllDirectories).
+                                        OrderByDescending(x => new FileInfo(x).LastWriteTime).ToList() : new List<string>());
             }
         }
 
@@ -111,13 +112,13 @@ namespace BuildServer
             BranchName = branchName;
         }
 
-        public void Build()
+        public Task Build()
         {
             if (BuildingState == BuildState.Paused)
             {
                 // This will still preseve the queued builds so that when we resume we will build automatically
                 Console.WriteLine("Build paused so request ignored");
-                return;
+                return Task.Run(() => { });
             }
             else if (BuildingState == BuildState.Building)
             {
@@ -125,7 +126,7 @@ namespace BuildServer
                 Queued = true;
                 Console.WriteLine("Build already underway so another will be queued");
 
-                return;
+                return Task.Run(() => { });
             }
 
             // Now set the branch to be building
@@ -136,7 +137,7 @@ namespace BuildServer
             Queued = false;
 
             // Build and test in separate task to not block main build server from testing other projects
-            Task.Run(() =>
+            return Task.Run(() =>
             {
                 Checkout();
 
@@ -303,7 +304,7 @@ namespace BuildServer
 
             foreach (User user in Notifiers.Values)
             {
-                user.Message(logFilePath, messageContents, BranchName, passed);
+                user.Message(messageContents, BranchName, passed);
             }
 
             Console.WriteLine("Testing run complete");

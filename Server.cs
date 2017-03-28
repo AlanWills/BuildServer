@@ -46,9 +46,10 @@ namespace BuildServer
         
         private void NightlyBuild_DoWork(object state)
         {
+            // Build each branch synchronously as they all interfere with certain universal export folders
             foreach (Branch branch in Branches.Values)
             {
-                branch.Build();
+                branch.Build().Wait();
             }
         }
 

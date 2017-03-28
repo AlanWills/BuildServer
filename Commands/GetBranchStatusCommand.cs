@@ -26,6 +26,7 @@ namespace BuildServer
             }
 
             HTMLWriter html = new HTMLWriter();
+            html.CreateH2("Branches on Build Server");
 
             foreach (string branchName in branches)
             {
@@ -42,7 +43,7 @@ namespace BuildServer
         {
             Branch branch = server.Branches[branchName];
 
-            builder.CreateH2("")
+            builder.CreateH3("")
                    .CreateLink(server.BaseAddress + CommandStrings.ViewBuildHistory + "?branch=" + branchName, branchName)
                    .AddStyling(new Tuple<string, string>("font-weight", "bold"));
 

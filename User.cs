@@ -44,7 +44,7 @@ namespace BuildServer
         /// Either sends back via comms or emails the inputted string in the string builder to me if there is no connection
         /// </summary>
         /// <param name="testRunInformation"></param>
-        public void Message(string logFilePath, StringBuilder testRunInformation, string branchName, bool passed)
+        public void Message(StringBuilder testRunInformation, string branchName, bool passed)
         {
             if (passed && UserNotifySetting != NotifySetting.kAlwaysNotify)
             {
@@ -60,16 +60,12 @@ namespace BuildServer
             testRunInformation.AppendLine("Build Request completed at " + buildCompleteTime.ToShortTimeString());
             testRunInformation.AppendLine();
 
-            // Hard coded proxy port for now
             string url = "http://" + ServerIP + ":" + ClientPort + CommandStrings.GetFailedTests + "?branch=" + branchName;
             testRunInformation.AppendLine(url);
 
             try
             {
                 MailMessage mail = new MailMessage(ServerEmail, Email, (branchName + " - ") + (passed ? "Build Passed" : "Build Failed"), testRunInformation.ToString());
-
-                Console.WriteLine("Attaching log from file " + logFilePath);
-                mail.Attachments.Add(new Attachment(logFilePath));
 
                 SmtpClient client = new SmtpClient("smtp.gmail.com", 587);
                 client.UseDefaultCredentials = false;

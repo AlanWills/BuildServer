@@ -5,7 +5,8 @@
     <StartProgram>C:\Users\alan\Documents\GROW\Repos\GrowDesktop\Dev Tools\Git Hooks\Build Server\BuildServerClient.exe</StartProgram>
     <StartWorkingDirectory>
     </StartWorkingDirectory>
-    <StartArguments>Settings.xml</StartArguments>
+    <StartArguments>
+    </StartArguments>
   </PropertyGroup>
   <PropertyGroup>
     <ProjectView>ProjectFiles</ProjectView>

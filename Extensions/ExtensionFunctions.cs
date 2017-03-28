@@ -39,7 +39,7 @@ namespace BuildServer
                     return "red";
 
                 case TestState.Untested:
-                    return "yellow";
+                    return "blue";
 
                 default:
                     Debug.Fail("Unresolved test state colour");
