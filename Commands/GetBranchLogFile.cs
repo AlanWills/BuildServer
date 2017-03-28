@@ -55,7 +55,10 @@ namespace BuildServer
                 return "Could not find inputted log type for latest build";
             }
 
-            return "<pre>" + File.ReadAllText(logFile) + "</pre>";
+            HTMLWriter writer = new HTMLWriter();
+            writer.CreatePreservedParagraph(File.ReadAllText(logFile));
+
+            return writer.ToString();
         }
     }
 }

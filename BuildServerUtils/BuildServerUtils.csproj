@@ -45,8 +45,11 @@
     <Compile Include="BaseServer.cs" />
     <Compile Include="CmdLineUtils.cs" />
     <Compile Include="CommandStrings.cs" />
-    <Compile Include="IClientCommand.cs" />
-    <Compile Include="IServerCommand.cs" />
+    <Compile Include="HTML Utils\HTMLElement.cs" />
+    <Compile Include="HTML Utils\HTMLNode.cs" />
+    <Compile Include="HTML Utils\HTMLWriter.cs" />
+    <Compile Include="Command Interfaces\IClientCommand.cs" />
+    <Compile Include="Command Interfaces\IServerCommand.cs" />
     <Compile Include="Comms.cs" />
     <Compile Include="ExtensionFunctions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

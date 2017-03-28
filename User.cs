@@ -56,10 +56,12 @@ namespace BuildServer
 
             DateTime buildCompleteTime = DateTime.Now;
 
+            testRunInformation.AppendLine();
             testRunInformation.AppendLine("Build Request completed at " + buildCompleteTime.ToShortTimeString());
+            testRunInformation.AppendLine();
 
             // Hard coded proxy port for now
-            string url = "http://" + ServerIP + ":1491" + CommandStrings.GetFailedTests + "?branch=" + branchName;
+            string url = "http://" + ServerIP + ":" + ClientPort + CommandStrings.GetFailedTests + "?branch=" + branchName;
             testRunInformation.AppendLine(url);
 
             try

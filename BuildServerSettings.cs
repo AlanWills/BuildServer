@@ -17,6 +17,8 @@ namespace BuildServer
 
         public static int ServerPort { get; private set; }
 
+        public static int ClientPort { get; private set; }
+
         public static string ServerEmail { get; private set; }
 
         public static string ServerEmailUsername { get; private set; }
@@ -25,7 +27,7 @@ namespace BuildServer
 
         #endregion
 
-        public static void ReadFile(string filePath)
+        public static void ReadSettingsFile(string filePath)
         {
             if (!File.Exists(filePath))
             {
@@ -71,6 +73,29 @@ namespace BuildServer
                     {
                         ServerPort = port;
                         Console.WriteLine("ServerPort = " + port);
+                    }
+                }
+            }
+
+            // Client port
+            {
+                XmlNodeList clientPort = document.GetElementsByTagName("ClientPort");
+                if (clientPort.Count != 1 || string.IsNullOrEmpty(clientPort[0].InnerText))
+                {
+                    Console.WriteLine("No ClientPort in Settings File.");
+                    ClientPort = ServerPort;
+                }
+                else
+                {
+                    int port = -1;
+                    if (!int.TryParse(clientPort[0].InnerText, out port))
+                    {
+                        Console.WriteLine("Client Port is not a number.");
+                    }
+                    else
+                    {
+                        ClientPort = port;
+                        Console.WriteLine("ClientPort = " + port);
                     }
                 }
             }

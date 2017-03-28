@@ -46,25 +46,29 @@ namespace BuildServer.Commands
             HistoryFile file = new HistoryFile(historyFiles.Find(x => Directory.GetParent(x).Name == dir));
             file.Load();
 
-            StringBuilder str = new StringBuilder("<h2>Build Information</h2>");
-            str.AppendLine("<h3>Log Files</h3>");
-            str.AppendLine("<p><a href=\"" + server.BaseAddress + CommandStrings.GetLog + "?logtype=" + CommandStrings.BuildLog + "&" + CommandStrings.Branch + "=" + branchName + "\">Build Log</a></p>");
-            str.AppendLine("<p><a href=\"" + server.BaseAddress + CommandStrings.GetLog + "?logtype=" + CommandStrings.TestLog + "&" + CommandStrings.Branch + "=" + branchName + "\">Test Log</a></p>");
+            HTMLWriter writer = new HTMLWriter();
+
+            writer.CreateH2("Build Information");
+            writer.CreateH3("LogFiles");
+            writer.CreateParagraph("")
+                  .CreateLink(server.BaseAddress + CommandStrings.GetLog + "?logtype=" + CommandStrings.BuildLog + "&" + CommandStrings.Branch + "=" + branchName, "Build Log");
+            writer.CreateParagraph("")
+                  .CreateLink(server.BaseAddress + CommandStrings.GetLog + "?logtype=" + CommandStrings.TestLog + "&" + CommandStrings.Branch + "=" + branchName, "Test Log");
 
             List<string> failedTests = file.FailedTests;
             if (failedTests.Count == 0)
             {
-                str.AppendLine("<p>Branch passed successfully</p>");
+                writer.CreateParagraph("Branch passed successfully");
             }
 
-            str.AppendLine("<h3>Failed Tests</h3>");
+            writer.CreateH3("Failed Tests");
 
             foreach (string testName in file.FailedTests)
             {
-                str.AppendLine("<p>" + testName + "</p>");
+                writer.CreateParagraph(testName);
             }
 
-            return str.ToString();
+            return writer.ToString();
         }
     }
 }

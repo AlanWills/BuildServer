@@ -1,4 +1,5 @@
 ﻿using BuildServerUtils;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
@@ -24,38 +25,30 @@ namespace BuildServer
                 branches.AddRange(server.Branches.Keys);
             }
 
-            StringBuilder stringBuilder = new StringBuilder();
+            HTMLWriter html = new HTMLWriter();
 
             foreach (string branchName in branches)
             {
                 if (server.Branches.ContainsKey(branchName))
                 {
-                    GetBranchTestStateString(stringBuilder, server, branchName);
+                    GetBranchTestStateString(html, server, branchName);
                 }
             }
 
-            return stringBuilder.ToString();
+            return html.ToString();
         }
         
-        private string GetBranchTestStateString(StringBuilder builder, Server server, string branchName)
+        private string GetBranchTestStateString(HTMLWriter builder, Server server, string branchName)
         {
             Branch branch = server.Branches[branchName];
 
-            builder.Append("<h2><a style=\"font-weight:bold\" href=\"");
-            builder.Append(server.BaseAddress + CommandStrings.ViewBuildHistory);
-            builder.Append("?branch=" + branchName);
-            builder.Append("\">");
-            builder.Append(branchName);
-            builder.Append("</a></h2>");
-            builder.Append("<pre>Latest Build:   ");
-            builder.Append("<a style=\"color:");
-            builder.Append(GetTestStateColour(branch.TestingState));
-            builder.Append("\" href=\"");
-            builder.Append(server.BaseAddress + CommandStrings.GetFailedTests);
-            builder.Append("?branch=" + branchName);
-            builder.Append("&dir=" + CommandStrings.Latest);
-            builder.Append("\">");
-            builder.Append(branch.TestingState.DisplayString() + "</a></pre><br/>");
+            builder.CreateH2("")
+                   .CreateLink(server.BaseAddress + CommandStrings.ViewBuildHistory + "?branch=" + branchName, branchName)
+                   .AddStyling(new Tuple<string, string>("font-weight", "bold"));
+
+            builder.CreatePreservedParagraph("Latest Build:   ")
+                   .CreateLink(server.BaseAddress + CommandStrings.GetFailedTests + "?branch=" + branchName + "&dir=" + CommandStrings.Latest, branch.TestingState.DisplayString())
+                   .AddStyling(new Tuple<string, string>("color", GetTestStateColour(branch.TestingState)));
 
             return builder.ToString();
         }

@@ -29,12 +29,12 @@ namespace BuildServer
 
         #endregion
 
-        public Server(string ip, int port) : 
-            base(ip, port)
+        public Server(string ip, int serverPort, int clientPort) : 
+            base(ip, clientPort)
         {
             foreach (Type type in Assembly.GetExecutingAssembly().GetTypes().Where(x => x.GetCustomAttribute<CommandAttribute>() != null))
             {
-                Listener.Prefixes.Add("http://*:" + port.ToString() + type.GetCustomAttribute<CommandAttribute>().Token + "/");
+                Listener.Prefixes.Add("http://*:" + serverPort.ToString() + type.GetCustomAttribute<CommandAttribute>().Token + "/");
                 CommandRegistry.Add(type.GetCustomAttribute<CommandAttribute>().Token, Activator.CreateInstance(type) as IServerCommand);
             }
 

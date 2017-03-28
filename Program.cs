@@ -3,6 +3,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Xml;
+using static BuildServer.BuildServerSettings;
 
 namespace BuildServer
 {
@@ -14,9 +15,9 @@ namespace BuildServer
 
             Console.Title = "Build Server";
 
-            BuildServerSettings.ReadFile(Path.Combine(Directory.GetCurrentDirectory(), "Settings.xml"));
+            ReadSettingsFile(Path.Combine(Directory.GetCurrentDirectory(), "Settings.xml"));
 
-            using (Server server = new Server(BuildServerSettings.ServerIP, BuildServerSettings.ServerPort))
+            using (Server server = new Server(ServerIP, ServerPort, ClientPort))
             {
                 Console.WriteLine("Ready");
                 Console.ReadKey(true);

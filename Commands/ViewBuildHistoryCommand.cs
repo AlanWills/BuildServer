@@ -29,7 +29,9 @@ namespace BuildServer
                 return "Branch " + branchName + " not registered on server";
             }
 
-            StringBuilder historyInfo = new StringBuilder("<h2>" + branchName + " Build History</h2>");
+            HTMLWriter writer = new HTMLWriter();
+
+            writer.CreateH2(branchName + " Build History");
 
             string[] quantities = arguments.GetValues("quantity");
             string quantityString = quantities?.Length > 0 ? quantities[0] : "10";
@@ -43,31 +45,29 @@ namespace BuildServer
             }
             else if(!int.TryParse(quantityString, out quantity))
             {
-                historyInfo.AppendLine(quantityString + " is not a valid quantity");
+                writer.CreateParagraph(quantityString + " is not a valid quantity");
             }
 
             for (int i = 0, n = Math.Min(quantity, historyFiles.Count); i < n; ++i)
             {
-                GetHistoryFileInfo(historyInfo, server, branchName, historyFiles[i]);
+                GetHistoryFileInfo(writer, server, branchName, historyFiles[i]);
             }
 
-            return historyInfo.ToString();
+            return writer.ToString();
         }
 
-        private void GetHistoryFileInfo(StringBuilder builder, Server server, string branchName, string filePath)
+        private void GetHistoryFileInfo(HTMLWriter builder, Server server, string branchName, string filePath)
         {
             string parentDirName = Directory.GetParent(filePath).Name;
 
             HistoryFile historyFile = new HistoryFile(filePath);
             historyFile.Load();
 
-            builder.Append("<pre><a href=\"");
-            builder.Append(server.BaseAddress + CommandStrings.GetFailedTests + "?branch=" + branchName + "&dir=" + parentDirName);
-            builder.Append("\">");
-            builder.Append(parentDirName);
-            builder.Append("</a>:  ");
-            builder.Append(historyFile.Status.DisplayString());
-            builder.AppendLine("</pre>");;
+            HTMLElement div = builder.CreateDiv()
+                                     .AddStyling(new Tuple<string, string>("margin-top", "20px"));
+                        div.CreateLink(server.BaseAddress + CommandStrings.GetFailedTests + "?branch=" + branchName + "&dir=" + parentDirName, parentDirName);
+                        div.CreateSpan(historyFile.Status.DisplayString())
+                           .AddStyling(new Tuple<string, string>("margin-left", "20px"));
         }
     }
 }
