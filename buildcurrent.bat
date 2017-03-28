@@ -1,3 +1,1 @@
-(
-echo buildcurrent
-echo quit) | BuildServerClient\BuildServerClient\bin\Debug\BuildServerClient.exe
+BuildServerClient.exe /build current
