@@ -65,6 +65,11 @@ namespace BuildServerUtils
             return CreateChild("p", text);
         }
 
+        public HTMLElement CreateLineBreak()
+        {
+            return CreateChild("<br>", "");
+        }
+
         public HTMLElement CreateButton(string label, string destinationURL)
         {
             return CreateChild("form", "")

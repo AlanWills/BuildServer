@@ -26,12 +26,12 @@ namespace BuildServer.Commands
             
             if (!server.Branches.ContainsKey(branchName))
             {
-                return "Branch " + branchName + " does not exist on the build server";
+                return branchName + " does not exist on the build server";
             }
 
             if (server.Branches[branchName].TestingState == Branch.TestState.Untested)
             {
-                return "Branch " + branchName + " has not been tested yet";
+                return branchName + " has not been tested yet";
             }
 
             string[] dirs = arguments.GetValues("dir");

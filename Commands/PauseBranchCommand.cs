@@ -22,7 +22,7 @@ namespace BuildServer
             string branchName = branchNames[0];
             if (!server.Branches.ContainsKey(branchName))
             {
-                return "Branch" + branchName + " not registered on Build Server";
+                return branchName + " not registered on Build Server";
             }
 
             server.Branches[branchName].Pause();

@@ -26,7 +26,7 @@ namespace BuildServer
 
             if (!server.Branches.ContainsKey(branchName))
             {
-                return "Branch " + branchName + " not registered on server";
+                return branchName + " not registered on server";
             }
 
             HTMLWriter writer = new HTMLWriter();

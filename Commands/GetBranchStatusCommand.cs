@@ -63,6 +63,8 @@ namespace BuildServer
                 builder.CreateButton("Pause", server.BaseAddress + CommandStrings.PauseBranch + "?" + CommandStrings.Branch + "=" + branchName);
             }
 
+            builder.CreateLineBreak();
+
             return builder.ToString();
         }
     }

@@ -38,12 +38,12 @@ namespace BuildServer
 
             if (!server.Branches.ContainsKey(branchName))
             {
-                return "Branch " + branchName + " not registered on server";
+                return branchName + " not registered on server";
             }
 
             if (server.Branches[branchName].TestingState == Branch.TestState.Untested)
             {
-                return "Branch " + branchName + " has not been built yet";
+                return branchName + " has not been built yet";
             }
 
             List<string> historyFiles = server.Branches[branchName].OrderedHistoryFiles;

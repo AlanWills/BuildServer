@@ -19,7 +19,7 @@ namespace BuildServer
             
             if (!server.Branches.ContainsKey(branchName))
             {
-                return "Branch " + branchName + " does not exist on build server";
+                return branchName + " does not exist on build server";
             }
 
             Branch branch = server.Branches[branchName];
