@@ -1,1 +1,1 @@
-BuildServerClient.exe /build current
+BSC.exe /build current
