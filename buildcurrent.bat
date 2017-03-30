@@ -1,1 +1,0 @@
-BSC.exe /build current
