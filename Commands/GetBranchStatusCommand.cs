@@ -58,8 +58,9 @@ namespace BuildServer
             {
                 builder.CreateButton("Resume", server.BaseAddress + CommandStrings.ResumeBranch + "?" + CommandStrings.Branch + "=" + branchName);
             }
-            else if (branch.BuildingState == BuildState.Building)
+            else
             {
+                // Should always be able to pause if not paused already
                 builder.CreateButton("Pause", server.BaseAddress + CommandStrings.PauseBranch + "?" + CommandStrings.Branch + "=" + branchName);
             }
 

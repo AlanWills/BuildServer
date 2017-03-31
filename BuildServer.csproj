@@ -72,7 +72,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="buildcurrent.bat" />
+    <None Include="BuildEvents\buildcurrent.bat" />
+    <None Include="BuildEvents\compile.bat" />
+    <None Include="BuildEvents\delete_test_results.bat" />
+    <None Include="BuildEvents\run_tests.bat" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

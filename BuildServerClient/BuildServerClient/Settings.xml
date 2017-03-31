@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Root>
-  <ServerIP>192.168.0.25</ServerIP>
+  <ServerIP>10.84.108.1</ServerIP>
   <ServerPort>1490</ServerPort>
   <Email>alan@grow.am</Email>
   <!--Put N here for all build updates-->
