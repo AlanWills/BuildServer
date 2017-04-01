@@ -1,3 +1,11 @@
 bin/
 obj/
 .vs/
+
+Settings.xml
+
+# Build Events
+buildcurrent.bat
+compile.bat
+delete_test_results.bat
+run_tests.bat

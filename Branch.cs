@@ -248,7 +248,6 @@ namespace BuildServer
             Console.WriteLine("Checkout of " + BranchName + " completed");
         }
 
-
         /// <summary>
         /// Reads the log file for the Celeste Engine and either sends back the result or emails the result
         /// </summary>
