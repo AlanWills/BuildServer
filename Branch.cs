@@ -151,7 +151,7 @@ namespace BuildServer
                     using (StreamWriter writer = new StreamWriter(stream))
                     {
                         Console.WriteLine("Starting build of " + BranchName);
-                        CmdLineUtils.PerformCommand(Path.Combine(repoDir, "Dev Tools", "Git Hooks", "Build Server", "compile.bat"), repoDir, outputWriter: writer);
+                        CmdLineUtils.PerformCommand(Path.Combine(repoDir, BuildServerSettings.CompileScriptRelativePath), repoDir, outputWriter: writer);
                         Console.WriteLine("Build of " + BranchName + " completed");
                     }
                 }
@@ -165,7 +165,7 @@ namespace BuildServer
                         Console.WriteLine("Starting test run of " + BranchName);
 
                         // Working directory for testing must absolutely be inside the repo because the test results files are created in the working directory
-                        CmdLineUtils.PerformCommand(Path.Combine(repoDir, "Dev Tools", "Git Hooks", "Build Server", "run_tests.bat"), repoDir, outputWriter: writer);
+                        CmdLineUtils.PerformCommand(Path.Combine(repoDir, BuildServerSettings.RunTestsScriptRelativePath), repoDir, outputWriter: writer);
                         Console.WriteLine("Test run of " + BranchName + " completed");
                     }
                 }
