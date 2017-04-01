@@ -6,6 +6,8 @@
   <ServerPort>1490</ServerPort>
   <!--The port the client will connect to.  Used in case we are using a proxy server.  If not using a proxy, set this equal to ServerPort-->
   <ClientPort>1490</ClientPort>
+  <CompileScriptRelativePath>Dev Tools\Git Hook\Build Server\compile.bat</CompileScriptRelativePath>
+  <RunTestsScriptRelativePath>Dev Tools\Git Hook\Build Server\run_tests.bat</RunTestsScriptRelativePath>
   <ServerEmail>jenkins@grow.am</ServerEmail>
   <ServerEmailUsername>jenkins@grow.am</ServerEmailUsername>
   <ServerEmailPassword>Sdd%3UH&amp;!</ServerEmailPassword>

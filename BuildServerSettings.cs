@@ -21,6 +21,10 @@ namespace BuildServer
 
         public static int ClientPort { get; private set; }
 
+        public static string CompileScriptRelativePath { get; private set; }
+
+        public static string RunTestsScriptRelativePath { get; private set; }
+
         public static string ServerEmail { get; private set; }
 
         public static string ServerEmailUsername { get; private set; }
@@ -98,8 +102,8 @@ namespace BuildServer
                 XmlNodeList clientPort = document.GetElementsByTagName("ClientPort");
                 if (clientPort.Count != 1 || string.IsNullOrEmpty(clientPort[0].InnerText))
                 {
-                    Console.WriteLine("No ClientPort in Settings File.");
                     ClientPort = ServerPort;
+                    Console.WriteLine("ClientPort = " + ClientPort);
                 }
                 else
                 {
@@ -114,6 +118,36 @@ namespace BuildServer
                         Console.WriteLine("ClientPort = " + port);
                     }
                 }
+            }
+
+            // Compile script relative path
+            {
+                XmlNodeList compileScript = document.GetElementsByTagName("CompileScriptRelativePath");
+                if (compileScript.Count != 1 || string.IsNullOrEmpty(compileScript[0].InnerText))
+                {
+                    CompileScriptRelativePath = "compile.bat";
+                }
+                else
+                {
+                    CompileScriptRelativePath = compileScript[0].InnerText;
+                }
+
+                Console.WriteLine("CompileScriptRelativePath = " + CompileScriptRelativePath);
+            }
+
+            // Run tests script relative path
+            {
+                XmlNodeList runTestsScript = document.GetElementsByTagName("RunTestsScriptRelativePath");
+                if (runTestsScript.Count != 1 || string.IsNullOrEmpty(runTestsScript[0].InnerText))
+                {
+                    RunTestsScriptRelativePath = "run_tests.bat";
+                }
+                else
+                {
+                    RunTestsScriptRelativePath = runTestsScript[0].InnerText;
+                }
+
+                Console.WriteLine("RunTestsScriptRelativePath = " + RunTestsScriptRelativePath);
             }
 
             // Server email
