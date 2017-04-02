@@ -34,7 +34,7 @@ namespace BuildServer
         {
             foreach (Type type in Assembly.GetExecutingAssembly().GetTypes().Where(x => x.GetCustomAttribute<CommandAttribute>() != null))
             {
-                Listener.Prefixes.Add("http://*:" + serverPort.ToString() + type.GetCustomAttribute<CommandAttribute>().Token + "/");
+                Listener.Prefixes.Add("http://*:" + serverPort.ToString() + "/" + type.GetCustomAttribute<CommandAttribute>().Token + "/");
                 CommandRegistry.Add(type.GetCustomAttribute<CommandAttribute>().Token, Activator.CreateInstance(type) as IServerCommand);
             }
 
@@ -80,6 +80,9 @@ namespace BuildServer
                 // Ignore cruft (although it should never actually get here
                 return;
             }
+
+            // Remove starting '/'
+            url = url.Substring(1);
 
             Console.WriteLine("Command received: " + url);
 

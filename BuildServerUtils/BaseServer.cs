@@ -23,7 +23,7 @@ namespace BuildServerUtils
 
         public BaseServer(string ip, int port)
         {
-            BaseAddress = "http://" + ip + ":" + port.ToString();
+            BaseAddress = "http://" + ip + ":" + port.ToString() + "/";
 
             Listener = new HttpListener();
             Listener.Start();

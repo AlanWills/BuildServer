@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Text;
 
 namespace BuildServer
 {
@@ -22,14 +23,18 @@ namespace BuildServer
             string email = arguments.GetValues("email")?[0];
             string notifySetting = arguments.GetValues("only_email_on_fail")?[0];
 
+            StringBuilder response = new StringBuilder();
+
             if (!server.Branches.ContainsKey(branchName))
             {
-                return "Branch not registered on build server";
+                response.AppendLine(new AddBranchCommand().Execute(server, arguments));
             }
 
             server.Branches[branchName].Build(email, notifySetting);
 
-            return "build Command received by Build Server";
+            response.AppendLine("build Command received by Build Server");
+
+            return response.ToString();
         }
     }
 }

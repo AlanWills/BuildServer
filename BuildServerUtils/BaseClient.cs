@@ -45,6 +45,11 @@ namespace BuildServerUtils
 
         private void Send(HttpMethod method, string uri, params KeyValuePair<string, string>[] parameters)
         {
+            if (!uri.StartsWith("/"))
+            {
+                uri = "/" + uri;
+            }
+
             StringBuilder fullRequest = new StringBuilder(uri);
 
             for (int i = 0; i < parameters.Length; ++i)
