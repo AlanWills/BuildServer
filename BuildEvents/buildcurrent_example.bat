@@ -1,1 +1,1 @@
-"Dev Tools\Git Hooks\Build Server\BSC.exe" /build current
+"Dev Tools\Git Hooks\Build Server\BSC.exe" build current

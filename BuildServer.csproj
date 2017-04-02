@@ -76,6 +76,7 @@
     <None Include="BuildEvents\compile_example.bat" />
     <None Include="BuildEvents\delete_test_results_example.bat" />
     <None Include="BuildEvents\run_tests_example.bat" />
+    <None Include="Hooks\pre-push_example" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
