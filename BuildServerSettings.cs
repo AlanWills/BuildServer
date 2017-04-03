@@ -31,6 +31,8 @@ namespace BuildServer
 
         public static string ServerEmailPassword { get; private set; }
 
+        public static string SlackURL { get; private set; }
+
         #endregion
 
         public static void ReadSettingsFile(string filePath)
@@ -189,6 +191,20 @@ namespace BuildServer
                 {
                     ServerEmailPassword = emailPassword[0].InnerText;
                     Console.WriteLine("ServerEmailPassword = " + ServerEmailPassword);
+                }
+            }
+
+            // Slack URL
+            {
+                XmlNodeList slackURL = document.GetElementsByTagName("SlackURL");
+                if (slackURL.Count != 1 || string.IsNullOrEmpty(slackURL[0].InnerText))
+                {
+                    Console.WriteLine("No Slack URL in Settings File.");
+                }
+                else
+                {
+                    SlackURL = slackURL[0].InnerText;
+                    Console.WriteLine("SlackURL = " + SlackURL);
                 }
             }
         }

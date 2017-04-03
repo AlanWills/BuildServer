@@ -61,6 +61,8 @@
     <Compile Include="Commands\HelpCommand.cs" />
     <Compile Include="Commands\ResumeBranchCommand.cs" />
     <Compile Include="Commands\PauseBranchCommand.cs" />
+    <Compile Include="Commands\TestSlackCommand.cs" />
+    <Compile Include="Commands\TestEmailCommand.cs" />
     <Compile Include="Commands\ViewBuildHistoryCommand.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

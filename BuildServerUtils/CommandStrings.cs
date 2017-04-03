@@ -27,5 +27,9 @@ namespace BuildServerUtils
         public const string ResumeBranch = "resume";
         public const string DeleteBranch = "delete";
         public const string AddBranch = "add";
+        public const string TestEmail = "testemail";
+        public const string TestSlack = "testslack";
+        public const string EmailAddress = "email";
+        public const string SlackURL = "slackURL";
     }
 }

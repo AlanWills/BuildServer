@@ -4,8 +4,10 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.Script.Serialization;
 using System.Xml;
 
 namespace BuildServer
@@ -304,7 +306,23 @@ namespace BuildServer
                 user.Message(messageContents, BranchName, passed);
             }
 
+            SendSlackMessage(passed);
+
             Console.WriteLine("Testing run complete");
+        }
+        
+        /// <summary>
+        /// Wrapper function to allow a command to call this function
+        /// </summary>
+        public void SendSlackMessage(bool passed)
+        {
+            JavaScriptSerializer serializer = new JavaScriptSerializer();
+            string url = "http://" + BuildServerSettings.ServerIP + ":" + BuildServerSettings.ClientPort + CommandStrings.GetFailedTests + "?branch=" + BranchName;
+            string content = serializer.Serialize(new { text = ("Branch: " + BranchName + " " + (passed ? "passed" : "failed <" + url + ">")) });
+
+            HttpClient client = new HttpClient();
+            StringContent contentPost = new StringContent(content, Encoding.UTF8, "application/json");
+            client.PostAsync(BuildServerSettings.SlackURL, contentPost);
         }
 
         /// <summary>

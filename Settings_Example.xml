@@ -6,7 +6,10 @@
   <ServerPort>1490</ServerPort>
   <!--The port the client will connect to.  Used in case we are using a proxy server.  If not using a proxy, set this equal to ServerPort-->
   <ClientPort>1490</ClientPort>
+  <CompileScriptRelativePath>Build Server\compile.bat</CompileScriptRelativePath>
+  <RunTestsScriptRelativePath>Build Server\run_tests.bat</RunTestsScriptRelativePath>
   <ServerEmail></ServerEmail>
   <ServerEmailUsername></ServerEmailUsername>
   <ServerEmailPassword></ServerEmailPassword>
+  <SlackURL>https://hooks.slack.com/services/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</SlackURL>
 </Root>
