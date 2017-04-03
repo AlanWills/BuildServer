@@ -13,7 +13,7 @@ namespace BuildServer
         {
             Server server = baseServer as Server;
 
-            string[] branchNames = arguments.GetValues(CommandStrings.Branch);
+            string[] branchNames = arguments.GetValues(ParameterStrings.Branch);
             if (branchNames == null)
             {
                 return "No branch passed to command";

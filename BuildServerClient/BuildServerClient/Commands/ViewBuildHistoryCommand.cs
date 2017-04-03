@@ -13,12 +13,12 @@ namespace BuildServerClient
 
         public void Execute(BaseClient client, List<string> parameters)
         {
-            string branchName = (parameters.Count == 0 || parameters[0] == CommandStrings.CurrentBranch) ? ClientSettings.CurrentBranch : parameters[0];
+            string branchName = (parameters.Count == 0 || parameters[0] == ParameterStrings.CurrentBranch) ? ClientSettings.CurrentBranch : parameters[0];
             string quantityString = parameters.Count > 1 ? parameters[1] : "10";
 
             client.Get(
                 CommandStrings.ViewBuildHistory,
-                new KeyValuePair<string, string>(CommandStrings.Branch, branchName),
+                new KeyValuePair<string, string>(ParameterStrings.Branch, branchName),
                 new KeyValuePair<string, string>("quantity", quantityString));
         }
     }

@@ -17,7 +17,7 @@ namespace BuildServerClient
 
             client.Get(
                 CommandStrings.TestEmail,
-                new KeyValuePair<string, string>(CommandStrings.EmailAddress, emailAddress));
+                new KeyValuePair<string, string>(ParameterStrings.EmailAddress, emailAddress));
         }
     }
 }

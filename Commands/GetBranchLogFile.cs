@@ -23,12 +23,12 @@ namespace BuildServer
             }
 
             string logType = logTypes.Length > 0 ? logTypes[0] : "";
-            if ((logType != CommandStrings.BuildLog) && (logType != CommandStrings.TestLog))
+            if ((logType != ParameterStrings.BuildLog) && (logType != ParameterStrings.TestLog))
             {
-                return "Inputted log type was invalid.  Please enter '" + CommandStrings.BuildLog + "' or '" + CommandStrings.TestLog + "'";
+                return "Inputted log type was invalid.  Please enter '" + ParameterStrings.BuildLog + "' or '" + ParameterStrings.TestLog + "'";
             }
 
-            string[] branches = arguments.GetValues(CommandStrings.Branch);
+            string[] branches = arguments.GetValues(ParameterStrings.Branch);
             if (branches == null)
             {
                 return "Specify a branch using branch=[branch_name]";
@@ -47,7 +47,7 @@ namespace BuildServer
             }
 
             List<string> historyFiles = server.Branches[branchName].OrderedHistoryFiles;
-            string fileName = logType == CommandStrings.BuildLog ? "BuildLog.txt" : "TestLog.txt";
+            string fileName = logType == ParameterStrings.BuildLog ? "BuildLog.txt" : "TestLog.txt";
             string logFile = Path.Combine(Directory.GetParent(historyFiles[0]).FullName, fileName);
 
             if (!File.Exists(logFile))

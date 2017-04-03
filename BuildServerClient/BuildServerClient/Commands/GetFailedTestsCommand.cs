@@ -17,12 +17,12 @@ namespace BuildServerClient.Commands
 
         public void Execute(BaseClient client, List<string> parameters)
         {
-            string branchName = (parameters.Count == 0 || parameters[0] == CommandStrings.CurrentBranch) ? ClientSettings.CurrentBranch : parameters[0];
-            string buildDirectory = (parameters.Count == 1 || parameters[1] == CommandStrings.Latest) ? CommandStrings.Latest : parameters[1];
+            string branchName = (parameters.Count == 0 || parameters[0] == ParameterStrings.CurrentBranch) ? ClientSettings.CurrentBranch : parameters[0];
+            string buildDirectory = (parameters.Count == 1 || parameters[1] == ParameterStrings.Latest) ? ParameterStrings.Latest : parameters[1];
 
             client.Get(
                 CommandStrings.GetFailedTests, 
-                new KeyValuePair<string, string>(CommandStrings.Branch, branchName),
+                new KeyValuePair<string, string>(ParameterStrings.Branch, branchName),
                 new KeyValuePair<string, string>("dir", buildDirectory));
         }
     }

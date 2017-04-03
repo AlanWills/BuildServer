@@ -15,21 +15,13 @@ namespace BuildServerUtils
         public const string Settings = "settings";
         public const string Reconnect = "reconnect";
         public const string ViewBuildHistory = "history";
-        public const string CurrentBranch = "current";
-        public const string All = "all";
-        public const string Branch = "branch";
         public const string GetFailedTests = "failedtests";
         public const string GetLog = "log";
-        public const string BuildLog = "build";
-        public const string TestLog = "test";
-        public const string Latest = "latest";
         public const string PauseBranch = "pause";
         public const string ResumeBranch = "resume";
         public const string DeleteBranch = "delete";
         public const string AddBranch = "add";
         public const string TestEmail = "testemail";
         public const string TestSlack = "testslack";
-        public const string EmailAddress = "email";
-        public const string SlackURL = "slackURL";
     }
 }

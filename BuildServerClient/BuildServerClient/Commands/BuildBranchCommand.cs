@@ -18,13 +18,13 @@ namespace BuildServerClient
 
         public void Execute(BaseClient client, List<string> parameters)
         {
-            string branchName = (parameters.Count == 0 || parameters[0] == CommandStrings.CurrentBranch) ? ClientSettings.CurrentBranch : parameters[0];
+            string branchName = (parameters.Count == 0 || parameters[0] == ParameterStrings.CurrentBranch) ? ClientSettings.CurrentBranch : parameters[0];
             string email = parameters.Count > 1 ? parameters[1] : ClientSettings.Email;
             string notifySetting = parameters.Count > 2 ? parameters[2] : ClientSettings.NotifySetting;
 
             client.Post(
                 CommandStrings.BuildBranch,
-                new ValuePair(CommandStrings.Branch, branchName),
+                new ValuePair(ParameterStrings.Branch, branchName),
                 new ValuePair("email", email),
                 new ValuePair("only_email_on_fail", notifySetting));
         }

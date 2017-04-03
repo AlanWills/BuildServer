@@ -19,19 +19,19 @@ namespace BuildServerClient
         public void Execute(BaseClient client, List<string> parameters)
         { 
             if (parameters.Count == 0 ||
-                (parameters[0] != CommandStrings.BuildLog && parameters[0] != CommandStrings.TestLog))
+                (parameters[0] != ParameterStrings.BuildLog && parameters[0] != ParameterStrings.TestLog))
             {
-                Console.WriteLine("Invalid input for log type.  Please enter either '" + CommandStrings.BuildLog + "' or '" + CommandStrings.TestLog + "'");
+                Console.WriteLine("Invalid input for log type.  Please enter either '" + ParameterStrings.BuildLog + "' or '" + ParameterStrings.TestLog + "'");
                 return;
             }
 
             string logType = parameters[0];
-            string branchName = (parameters.Count == 1 || parameters[1] == CommandStrings.CurrentBranch) ? ClientSettings.CurrentBranch : parameters[1];
+            string branchName = (parameters.Count == 1 || parameters[1] == ParameterStrings.CurrentBranch) ? ClientSettings.CurrentBranch : parameters[1];
 
             client.Get(
                 CommandStrings.GetLog,
                 new KeyValuePair<string, string>("logtype", logType),
-                new KeyValuePair<string, string>(CommandStrings.Branch, branchName));
+                new KeyValuePair<string, string>(ParameterStrings.Branch, branchName));
         }
     }
 }

@@ -16,7 +16,7 @@ namespace BuildServer
         {
             Server server = baseServer as Server;
 
-            string[] branches = arguments.GetValues(CommandStrings.Branch);
+            string[] branches = arguments.GetValues(ParameterStrings.Branch);
             if (branches == null)
             {
                 return "Specify a branch using branch=[branch_name]";
@@ -30,16 +30,16 @@ namespace BuildServer
             }
 
             HTMLWriter writer = new HTMLWriter();
-            writer.CreateLink(server.BaseAddress + CommandStrings.GetBranchStatus + "?branch=all", "Branches");
+            writer.CreateLink(server.BaseAddress + CommandStrings.GetBranchStatus + "?branch=" + ParameterStrings.All, "Branches");
             writer.CreateH2(branchName + " Build History");
 
-            string[] quantities = arguments.GetValues("quantity");
+            string[] quantities = arguments.GetValues(ParameterStrings.Quantity);
             string quantityString = quantities?.Length > 0 ? quantities[0] : "10";
             int quantity = 0;
 
             List<string> historyFiles = server.Branches[branchName].OrderedHistoryFiles;
 
-            if (quantityString == CommandStrings.All)
+            if (quantityString == ParameterStrings.All)
             {
                 quantity = historyFiles.Count;
             }

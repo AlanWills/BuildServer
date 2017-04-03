@@ -15,7 +15,7 @@ namespace BuildServer
         {
             Server server = baseServer as Server;
             
-            string branchName = arguments.GetValues(CommandStrings.Branch)?[0];
+            string branchName = arguments.GetValues(ParameterStrings.Branch)?[0];
             
             if (!server.Branches.ContainsKey(branchName))
             {

@@ -18,7 +18,7 @@ namespace BuildServerClient
 
             client.Get(
                 CommandStrings.GetBranchStatus,
-                new KeyValuePair<string, string>(CommandStrings.Branch, branchName));
+                new KeyValuePair<string, string>(ParameterStrings.Branch, branchName));
         }
     }
 }

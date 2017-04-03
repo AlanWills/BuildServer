@@ -17,11 +17,11 @@ namespace BuildServerClient
 
         public void Execute(BaseClient client, List<string> parameters)
         {
-            string branchName = (parameters.Count == 0 || parameters[0] == CommandStrings.CurrentBranch) ? ClientSettings.CurrentBranch : parameters[0];
+            string branchName = (parameters.Count == 0 || parameters[0] == ParameterStrings.CurrentBranch) ? ClientSettings.CurrentBranch : parameters[0];
            
             client.Post(
                 CommandStrings.AddBranch,
-                new KeyValuePair<string, string>(CommandStrings.Branch, branchName));
+                new KeyValuePair<string, string>(ParameterStrings.Branch, branchName));
         }
     }
 }

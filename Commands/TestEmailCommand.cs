@@ -16,7 +16,7 @@ namespace BuildServer
         {
             Server server = baseServer as Server;
 
-            string[] emails = arguments.GetValues(CommandStrings.EmailAddress);
+            string[] emails = arguments.GetValues(ParameterStrings.EmailAddress);
             if (emails == null)
             {
                 return "Specify an email using email=[email]";

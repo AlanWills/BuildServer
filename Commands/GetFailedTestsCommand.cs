@@ -14,7 +14,7 @@ namespace BuildServer.Commands
     {
         public string Execute(BaseServer baseServer, NameValueCollection arguments)
         {
-            string[] branches = arguments.GetValues(CommandStrings.Branch);
+            string[] branches = arguments.GetValues(ParameterStrings.Branch);
 
             if (branches == null)
             {
@@ -36,7 +36,7 @@ namespace BuildServer.Commands
 
             string[] dirs = arguments.GetValues("dir");
             List<string> historyFiles = server.Branches[branchName].OrderedHistoryFiles;
-            string dir = (dirs == null || dirs[0] == CommandStrings.Latest) ? Directory.GetParent(historyFiles[0]).Name : dirs[0];
+            string dir = (dirs == null || dirs[0] == ParameterStrings.Latest) ? Directory.GetParent(historyFiles[0]).Name : dirs[0];
 
             if (!historyFiles.Exists(x => Directory.GetParent(x).Name == dir))
             {
@@ -51,9 +51,9 @@ namespace BuildServer.Commands
             writer.CreateH2("Build Information");
             writer.CreateH3("LogFiles");
             writer.CreateParagraph("")
-                  .CreateLink(server.BaseAddress + CommandStrings.GetLog + "?logtype=" + CommandStrings.BuildLog + "&" + CommandStrings.Branch + "=" + branchName, "Build Log");
+                  .CreateLink(server.BaseAddress + CommandStrings.GetLog + "?logtype=" + ParameterStrings.BuildLog + "&" + ParameterStrings.Branch + "=" + branchName, "Build Log");
             writer.CreateParagraph("")
-                  .CreateLink(server.BaseAddress + CommandStrings.GetLog + "?logtype=" + CommandStrings.TestLog + "&" + CommandStrings.Branch + "=" + branchName, "Test Log");
+                  .CreateLink(server.BaseAddress + CommandStrings.GetLog + "?logtype=" + ParameterStrings.TestLog + "&" + ParameterStrings.Branch + "=" + branchName, "Test Log");
 
             List<string> failedTests = file.FailedTests;
             if (failedTests.Count == 0)
